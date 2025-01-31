@@ -10,11 +10,9 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -33,11 +31,24 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")  // 로그아웃 API 경로
+                         //.logoutUrl("/logout")  // 로그아웃 API 경로
                         .invalidateHttpSession(true) // 세션 무효화
                         .deleteCookies("JSESSIONID") // JSESSIONID 쿠키 삭제
+
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK); // 200 OK 응답 반환
+
+                            response.setContentType("application/json;charset=UTF-8"); // JSON 응답 설정
+
+                            String jsonResponse = """
+                                {
+                                    "sessionId": "",
+                                    "message": "로그아웃 성공."
+                                }
+                            """;
+
+                            response.getWriter().write(jsonResponse); // JSON 문자열 반환
+                            response.getWriter().flush();
                         })
                 )
                 .build();
