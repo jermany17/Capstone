@@ -1,9 +1,8 @@
 package com.example.capstone.controller;
 
-import com.example.capstone.dto.AddUserRequest;
+import com.example.capstone.dto.UserRequest;
 import com.example.capstone.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,13 +25,10 @@ public class UserApiController {
 
     // 회원가입 API
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, Object>> signup(@RequestBody AddUserRequest request) {
+    public ResponseEntity<Map<String, Object>> signup(@RequestBody UserRequest request) {
         try {
             Long userId = userService.save(request);
             Map<String, Object> response = new HashMap<>();
-            response.put("id", userId);
-            response.put("nickName", request.getNickName());
-            response.put("userId", request.getUserId());
             response.put("message", "회원가입이 완료되었습니다.");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -43,7 +39,7 @@ public class UserApiController {
 
     // 로그인 API (세션 방식)
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody AddUserRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserRequest request, HttpServletRequest httpServletRequest) {
         try {
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword());

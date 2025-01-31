@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AddUserRequest {
+public class UserRequest {
     private String nickName; // 사용자 이름
     private String userId; // 로그인 ID
     private String userPassword; // 비밀번호
