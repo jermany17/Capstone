@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,17 +23,34 @@ public class User implements UserDetails {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+    @Column(name = "nick_name", nullable = false, unique = true)
+    private String nickName; // 사용자 이름
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(name = "user_id", nullable = false, unique = true)
+    private String userId; // 로그인 ID
+
+    @Column(name = "user_password", nullable = false)
+    private String userPassword; // 비밀번호
+
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createAt; // 생성일시 (최초 생성 이후 변경되지 않음)
+
+    @Column(name = "update_at")
+    private LocalDateTime updateAt; // 수정일시
 
 
     @Builder
-    public User(String email, String password, String auth) {
-        this.email = email;
-        this.password = password;
+    public User(String nickName, String userId, String userPassword) {
+        this.nickName = nickName;
+        this.userId = userId;
+        this.userPassword = userPassword;
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now(); // 엔터티가 수정될 때 자동으로 updateAt 갱신
     }
 
     @Override
@@ -42,12 +60,12 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return userId;
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return userPassword;
     }
 
     @Override

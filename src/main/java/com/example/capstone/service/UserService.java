@@ -15,9 +15,11 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public Long save(AddUserRequest dto) {
-        return userRepository.save(User.builder()
-                .email(dto.getEmail())
-                .password(bCryptPasswordEncoder.encode(dto.getPassword())) // 패스워드 암호화
-                .build()).getId();
+        User user = User.builder()
+                .nickName(dto.getNickName())
+                .userId(dto.getUserId())
+                .userPassword(bCryptPasswordEncoder.encode(dto.getUserPassword())) // 비밀번호 암호화
+                .build();
+        return userRepository.save(user).getId();
     }
 }

@@ -26,12 +26,18 @@ public class UserApiController {
 
     // 회원가입 API
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody AddUserRequest request) {
+    public ResponseEntity<Map<String, Object>> signup(@RequestBody AddUserRequest request) {
         try {
-            userService.save(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
+            Long userId = userService.save(request);
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", userId);
+            response.put("nickName", request.getNickName());
+            response.put("userId", request.getUserId());
+            response.put("message", "회원가입이 완료되었습니다.");
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원가입 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "회원가입 실패: " + e.getMessage()));
         }
     }
 
@@ -40,7 +46,7 @@ public class UserApiController {
     public ResponseEntity<Map<String, String>> login(@RequestBody AddUserRequest request, HttpServletRequest httpServletRequest) {
         try {
             UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
+                    new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword());
 
             Authentication authentication = authenticationManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,7 +59,6 @@ public class UserApiController {
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("sessionId", ""); // 로그인 실패 시 세션 ID 없음
             errorResponse.put("message", "로그인 실패: " + e.getMessage());
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
