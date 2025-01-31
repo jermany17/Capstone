@@ -36,18 +36,33 @@ public class WebSecurityConfig {
                         .deleteCookies("JSESSIONID") // JSESSIONID 쿠키 삭제
 
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK); // 200 OK 응답 반환
 
                             response.setContentType("application/json;charset=UTF-8"); // JSON 응답 설정
 
-                            String jsonResponse = """
-                                {
-                                    "sessionId": "",
-                                    "message": "로그아웃 성공."
-                                }
-                            """;
+                            // 로그아웃 후 세션 확인
+                            String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : "";
 
-                            response.getWriter().write(jsonResponse); // JSON 문자열 반환
+                            // 세션이 남아 있으면 로그아웃 실패 처리
+                            if (!sessionId.isEmpty()) {
+                                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500 상태 코드 반환
+                                String jsonResponse = """
+                                    {
+                                        "sessionId": "%s",
+                                        "message": "로그아웃 실패: 세션이 완전히 삭제되지 않았습니다."
+                                    }
+                                """.formatted(sessionId);
+                                response.getWriter().write(jsonResponse);
+                            } else {
+                                response.setStatus(HttpServletResponse.SC_OK); // 200 OK 응답 반환
+                                String jsonResponse = """
+                                    {
+                                        "sessionId": "%s",
+                                        "message": "로그아웃 성공."
+                                    }
+                                """.formatted(sessionId);
+                                response.getWriter().write(jsonResponse);
+                            }
+
                             response.getWriter().flush();
                         })
                 )
