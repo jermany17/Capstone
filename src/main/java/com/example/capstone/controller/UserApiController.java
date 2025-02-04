@@ -1,6 +1,7 @@
 package com.example.capstone.controller;
 
 import com.example.capstone.domain.User;
+import com.example.capstone.dto.UpdateUserPassword;
 import com.example.capstone.dto.UserInfo;
 import com.example.capstone.dto.UserRequest;
 import com.example.capstone.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class UserApiController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     // nickName 중복 확인 API
     @GetMapping("/check-nickname")
@@ -82,6 +85,7 @@ public class UserApiController {
             session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
 
             Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "로그인 성공");
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
@@ -103,6 +107,26 @@ public class UserApiController {
         return ResponseEntity.ok(userInfo);
     }
 
+    // 비밀번호 변경
+    @PutMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody UpdateUserPassword updateUserPassword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = (User) authentication.getPrincipal();  // 현재 로그인한 사용자 가져오기
+
+        // 현재 비밀번호가 일치하는지 확인
+        if (!bCryptPasswordEncoder.matches(updateUserPassword.getCurrentPassword(), user.getUserPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+        }
+
+        // 새로운 비밀번호 암호화 후 서비스 호출
+        String encodedNewPassword = bCryptPasswordEncoder.encode(updateUserPassword.getNewPassword());
+        userService.updatePassword(user, encodedNewPassword);
+
+        return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
+    }
+
+    // 회원 삭제
     @DeleteMapping("/delete-account")
     public ResponseEntity<Map<String, String>> deleteUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

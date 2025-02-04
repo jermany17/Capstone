@@ -1,6 +1,7 @@
 package com.example.capstone.service;
 
 import com.example.capstone.domain.User;
+import com.example.capstone.dto.UpdateUserPassword;
 import com.example.capstone.dto.UserRequest;
 import com.example.capstone.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,13 @@ public class UserService {
     // userId 중복 확인
     public boolean isUserIdExists(String userId) {
         return userRepository.existsByUserId(userId);
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public void updatePassword(User user, String encodedNewPassword) {
+        user.changePassword(encodedNewPassword);
+        userRepository.save(user);
     }
 
     // 회원 삭제

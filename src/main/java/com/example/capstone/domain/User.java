@@ -53,6 +53,12 @@ public class User implements UserDetails {
         this.updateAt = LocalDateTime.now(); // 엔터티가 수정될 때 자동으로 updateAt 갱신
     }
 
+    // 비밀번호 변경 메서드 추가
+    public void changePassword(String newPassword) {
+        this.userPassword = newPassword;
+        this.updateAt = LocalDateTime.now(); // 비밀번호 변경 시 updateAt 자동 업데이트
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() { // 사용자의 권한 목록
         return List.of(new SimpleGrantedAuthority("user"));
