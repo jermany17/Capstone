@@ -91,26 +91,6 @@ public class UserApiController {
         }
     }
 
-    @GetMapping("/auth/check")
-    public ResponseEntity<Map<String, Object>> checkAuthStatus() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // 인증되지 않은 경우 처리
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() instanceof String) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "로그인하지 않은 상태입니다."));
-        }
-
-        // 로그인된 사용자 정보 반환
-        User user = (User) authentication.getPrincipal();
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "로그인 상태입니다.");
-        response.put("nickName", user.getNickName());
-        response.put("userId", user.getUserId());
-
-        return ResponseEntity.ok(response);
-    }
-
     // 로그인된 사용자 정보 조회 API (비밀번호 제외)
     @GetMapping("/userinfo")
     public ResponseEntity<UserInfo> getUserInfo() {

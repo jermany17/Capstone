@@ -31,7 +31,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // 로그인 없이 접근 가능
-                        .requestMatchers("/check-nickname", "/check-userid", "/signup", "/login", "/logout", "/auth/check").permitAll()
+                        .requestMatchers("/check-nickname", "/check-userid", "/signup", "/login", "/logout").permitAll()
 
                         // 로그인된 사용자만 접근 가능
                         .requestMatchers("/userinfo", "/delete-account").authenticated()
