@@ -3,7 +3,10 @@ package com.example.capstone.service;
 import com.example.capstone.domain.User;
 import com.example.capstone.dto.UserRequest;
 import com.example.capstone.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +35,11 @@ public class UserService {
     // userId 중복 확인
     public boolean isUserIdExists(String userId) {
         return userRepository.existsByUserId(userId);
+    }
+
+    // 회원 삭제
+    @Transactional
+    public void deleteUser(String userId) {
+        userRepository.deleteByUserId(userId);
     }
 }

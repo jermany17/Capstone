@@ -29,9 +29,12 @@ public class WebSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signup", "/login", "/logout", "/auth/check").permitAll() // 로그인 없이 접근 가능
-                        .requestMatchers("/check-nickname", "/check-userid").permitAll() // 로그인 없이 접근 가능
-                        .requestMatchers("/userinfo").authenticated() // 로그인된 사용자만 접근 가능
+
+                        // 로그인 없이 접근 가능
+                        .requestMatchers("/check-nickname", "/check-userid", "/signup", "/login", "/logout", "/auth/check").permitAll()
+
+                        // 로그인된 사용자만 접근 가능
+                        .requestMatchers("/userinfo", "/delete-account").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

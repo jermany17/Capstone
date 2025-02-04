@@ -123,5 +123,16 @@ public class UserApiController {
         return ResponseEntity.ok(userInfo);
     }
 
+    @DeleteMapping("/delete-account")
+    public ResponseEntity<Map<String, String>> deleteUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = (User) authentication.getPrincipal(); // 현재 로그인한 사용자 가져오기
+
+        userService.deleteUser(user.getUserId()); // userId만 Service로 전달
+
+        return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었습니다."));
+    }
+
     // 로그아웃 API = WebSecurityConfig에서 처리
 }
