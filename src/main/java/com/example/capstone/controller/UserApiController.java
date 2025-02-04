@@ -27,6 +27,30 @@ public class UserApiController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
+    // nickName 중복 확인 API
+    @GetMapping("/check-nickname")
+    public ResponseEntity<Map<String, String>> checkNickName(@RequestParam String nickName) {
+        boolean exists = userService.isNickNameExists(nickName);
+
+        if (exists) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이미 사용 중인 닉네임입니다.")); // 400
+        } else {
+            return ResponseEntity.ok(Map.of("message", "사용 가능한 닉네임입니다."));
+        }
+    }
+
+    // userId 중복 확인 API
+    @GetMapping("/check-userid")
+    public ResponseEntity<Map<String, String>> checkUserId(@RequestParam String userId) {
+        boolean exists = userService.isUserIdExists(userId);
+
+        if (exists) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이미 사용 중인 아이디입니다.")); // 400
+        } else {
+            return ResponseEntity.ok(Map.of("message", "사용 가능한 아이디입니다."));
+        }
+    }
+
     // 회원가입 API
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> signup(@RequestBody UserRequest request) {
