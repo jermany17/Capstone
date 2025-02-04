@@ -1,13 +1,10 @@
 package com.example.capstone.service;
 
 import com.example.capstone.domain.User;
-import com.example.capstone.dto.UpdateUserPassword;
-import com.example.capstone.dto.UserRequest;
+import com.example.capstone.dto.AddUser;
 import com.example.capstone.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +16,7 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     // 회원 정보 저장
-    public Long save(UserRequest dto) {
+    public Long save(AddUser dto) {
         User user = User.builder()
                 .nickName(dto.getNickName())
                 .userId(dto.getUserId())

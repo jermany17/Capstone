@@ -3,7 +3,8 @@ package com.example.capstone.controller;
 import com.example.capstone.domain.User;
 import com.example.capstone.dto.UpdateUserPassword;
 import com.example.capstone.dto.UserInfo;
-import com.example.capstone.dto.UserRequest;
+import com.example.capstone.dto.AddUser;
+import com.example.capstone.dto.UserLogin;
 import com.example.capstone.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -19,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -56,7 +56,7 @@ public class UserApiController {
 
     // 회원가입 API
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, Object>> signup(@RequestBody UserRequest request) {
+    public ResponseEntity<Map<String, Object>> signup(@RequestBody AddUser request) {
         try {
             Long userId = userService.save(request);
             Map<String, Object> response = new HashMap<>();
@@ -70,7 +70,7 @@ public class UserApiController {
 
     // 로그인 API (세션 방식)
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserLogin request, HttpServletRequest httpServletRequest) {
         try {
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword());
