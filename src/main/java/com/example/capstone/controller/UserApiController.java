@@ -108,8 +108,8 @@ public class UserApiController {
     }
 
     // 비밀번호 변경
-    @PutMapping("/change-password")
-    public ResponseEntity<Map<String, String>> changePassword(@RequestBody UpdateUserPassword updateUserPassword) {
+    @PutMapping("/update-password")
+    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody UpdateUserPassword updateUserPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         User user = (User) authentication.getPrincipal();  // 현재 로그인한 사용자 가져오기
