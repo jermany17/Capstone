@@ -1,5 +1,7 @@
 package com.example.capstone.controller;
 
+import com.example.capstone.domain.User;
+import com.example.capstone.dto.UserInfo;
 import com.example.capstone.dto.UserRequest;
 import com.example.capstone.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,10 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -44,14 +48,16 @@ public class UserApiController {
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword());
 
+
             Authentication authentication = authenticationManager.authenticate(authToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            HttpSession session = httpServletRequest.getSession();
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
+
+            // 세션을 생성하고 SecurityContext를 저장
+            HttpSession session = httpServletRequest.getSession(true);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
 
             Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("sessionId", session.getId()); // 세션 ID 포함
-            responseBody.put("message", "로그인 성공.");
-
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
@@ -59,6 +65,38 @@ public class UserApiController {
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
+    }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<Map<String, Object>> checkAuthStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 인증되지 않은 경우 처리
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() instanceof String) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인하지 않은 상태입니다."));
+        }
+
+        // 로그인된 사용자 정보 반환
+        User user = (User) authentication.getPrincipal();
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("message", "로그인 상태입니다.");
+        response.put("nickName", user.getNickName());
+        response.put("userId", user.getUserId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 로그인된 사용자 정보 조회 API (비밀번호 제외)
+    @GetMapping("/userinfo")
+    public ResponseEntity<UserInfo> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 로그인된 사용자 정보 반환 (비밀번호 제외)
+        User user = (User) authentication.getPrincipal();
+        UserInfo userInfo = new UserInfo(user);
+
+        return ResponseEntity.ok(userInfo);
     }
 
     // 로그아웃 API = WebSecurityConfig에서 처리

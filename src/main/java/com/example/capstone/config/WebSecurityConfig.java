@@ -11,8 +11,10 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -27,11 +29,19 @@ public class WebSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signup", "/login", "/logout").permitAll() // 접근 가능 URL
+                        .requestMatchers("/signup", "/login", "/logout", "/auth/check").permitAll() // 접근 가능 URL
+                        .requestMatchers("/userinfo").authenticated() // 로그인된 사용자만 접근 가능
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> { // 인증되지 않은 사용자가 보호된 API에 접근했을 때
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\": \"로그인이 필요합니다.\"}");
+                        })
+                )
                 .logout(logout -> logout
-                         //.logoutUrl("/logout")  // 로그아웃 API 경로
+                        .logoutUrl("/logout")  // 로그아웃 API 경로
                         .invalidateHttpSession(true) // 세션 무효화
                         .deleteCookies("JSESSIONID") // JSESSIONID 쿠키 삭제
 
@@ -39,30 +49,15 @@ public class WebSecurityConfig {
 
                             response.setContentType("application/json;charset=UTF-8"); // JSON 응답 설정
 
-                            // 로그아웃 후 세션 확인
-                            String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : "";
+                            // 로그아웃 성공 응답
+                            response.setStatus(HttpServletResponse.SC_OK); // 200 OK 응답 반환
+                            String jsonResponse = """
+                                {
+                                    "message": "로그아웃 성공."
+                                }
+                            """;
 
-                            // 세션이 남아 있으면 로그아웃 실패 처리
-                            if (!sessionId.isEmpty()) {
-                                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500 상태 코드 반환
-                                String jsonResponse = """
-                                    {
-                                        "sessionId": "%s",
-                                        "message": "로그아웃 실패: 세션이 완전히 삭제되지 않았습니다."
-                                    }
-                                """.formatted(sessionId);
-                                response.getWriter().write(jsonResponse);
-                            } else {
-                                response.setStatus(HttpServletResponse.SC_OK); // 200 OK 응답 반환
-                                String jsonResponse = """
-                                    {
-                                        "sessionId": "%s",
-                                        "message": "로그아웃 성공."
-                                    }
-                                """.formatted(sessionId);
-                                response.getWriter().write(jsonResponse);
-                            }
-
+                            response.getWriter().write(jsonResponse);
                             response.getWriter().flush();
                         })
                 )
