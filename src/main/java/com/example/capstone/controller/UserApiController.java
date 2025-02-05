@@ -116,7 +116,7 @@ public class UserApiController {
 
         // 현재 비밀번호가 일치하는지 확인
         if (!bCryptPasswordEncoder.matches(updateUserPassword.getCurrentPassword(), user.getUserPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "현재 비밀번호가 일치하지 않습니다."));
         }
 
         // 새로운 비밀번호 암호화 후 서비스 호출
