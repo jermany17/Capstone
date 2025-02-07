@@ -47,6 +47,10 @@ public class UserApiController {
     // nickName 중복 확인 API
     @GetMapping("/check-nickname")
     public ResponseEntity<Map<String, String>> checkNickName(@RequestParam String nickName) {
+        if (nickName == null || nickName.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "닉네임을 입력해주세요.")); // 400
+        }
+
         boolean exists = userService.isNickNameExists(nickName);
 
         if (exists) {
@@ -59,6 +63,10 @@ public class UserApiController {
     // userId 중복 확인 API
     @GetMapping("/check-userid")
     public ResponseEntity<Map<String, String>> checkUserId(@RequestParam String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "아이디를 입력해주세요.")); // 400
+        }
+
         boolean exists = userService.isUserIdExists(userId);
 
         if (exists) {
