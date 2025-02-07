@@ -30,6 +30,19 @@ public class UserApiController {
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    // 로그인 여부 확인 API
+    @GetMapping("/check-login")
+    public ResponseEntity<Map<String, Object>> checkLoginStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 사용자가 인증되었는지 확인
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.ok(Map.of("isLoggedIn", false, "message", "로그인되지 않은 사용자입니다."));
+        }
+
+        return ResponseEntity.ok(Map.of("isLoggedIn", true, "message", "로그인된 사용자입니다."));
+    }
+
     // nickName 중복 확인 API
     @GetMapping("/check-nickname")
     public ResponseEntity<Map<String, String>> checkNickName(@RequestParam String nickName) {
