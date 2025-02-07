@@ -22,11 +22,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class WebSecurityConfig {
 
     private final UserDetailService userService;
+    private final CorsConfig corsConfig;
 
     // 특정 HTTP 요청에 대한 보안 규칙
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource())) // CORS 적용
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
 
