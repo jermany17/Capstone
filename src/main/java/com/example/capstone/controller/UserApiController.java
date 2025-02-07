@@ -37,7 +37,8 @@ public class UserApiController {
 
         // 사용자가 인증되었는지 확인
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            return ResponseEntity.ok(Map.of("isLoggedIn", false, "message", "로그인되지 않은 사용자입니다."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("isLoggedIn", false, "message", "로그인되지 않은 사용자입니다."));
         }
 
         return ResponseEntity.ok(Map.of("isLoggedIn", true, "message", "로그인된 사용자입니다."));
