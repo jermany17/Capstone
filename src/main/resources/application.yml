@@ -26,4 +26,4 @@ server:
 #        secure: true      # HTTP 환경에서는 false, HTTPS 환경에서는 true
 #        same-site: None    # SameSite=None 설정
   address: 0.0.0.0
-  port: 8080
+  # port: 8080
