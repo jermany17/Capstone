@@ -11,6 +11,8 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC 드라이버 사용
+#    hikari:
+#      #maximum-pool-size: 8
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect # MySQL 문법 사용
