@@ -19,5 +19,11 @@ spring:
         format_sql: true # SQL 쿼리를 보기 좋게 포맷팅하여 출력
 
 server:
+#  servlet:
+#    session:
+#      cookie:
+#        name: JSESSIONID   # 세션 쿠키 이름 설정
+#        secure: true      # HTTP 환경에서는 false, HTTPS 환경에서는 true
+#        same-site: None    # SameSite=None 설정
   address: 0.0.0.0
   port: 8080
