@@ -28,7 +28,7 @@ server:
     session:
       cookie:
         name: JSESSIONID   # 세션 쿠키 이름 설정
-        secure: false      # HTTP 환경에서는 false, HTTPS 환경에서는 true
+        secure: true       # HTTPS 환경에서는 true, HTTP 환경에서는 false
         same-site: None    # SameSite=None 설정
   address: 0.0.0.0
   # port: 8080
