@@ -25,11 +25,6 @@ public class UserService {
         return userRepository.save(user).getId();
     }
 
-    // nickName 중복 확인
-    public boolean isNickNameExists(String nickName) {
-        return userRepository.existsByNickName(nickName);
-    }
-
     // userId 중복 확인
     public boolean isUserIdExists(String userId) {
         return userRepository.existsByUserId(userId);

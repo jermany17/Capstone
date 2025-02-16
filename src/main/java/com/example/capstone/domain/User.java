@@ -23,7 +23,7 @@ public class User implements UserDetails {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "nick_name", nullable = false, unique = true)
+    @Column(name = "nick_name", nullable = false)
     private String nickName; // 사용자 이름
 
     @Column(name = "user_id", nullable = false, unique = true)
