@@ -77,10 +77,15 @@ public class UserApiController {
             responseBody.put("message", "로그인 성공");
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("message", "로그인 실패: " + e.getMessage());
+            String errorMessage = "로그인 실패";
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            if (e.getMessage().contains("존재하지 않는 사용자")) {
+                errorMessage = "존재하지 않는 아이디입니다.";
+            } else if (e.getMessage().contains("자격 증명에 실패하였습니다")) {
+                errorMessage = "비밀번호가 틀렸습니다.";
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", errorMessage));
         }
     }
 
