@@ -1,10 +1,7 @@
 package com.example.capstone.controller;
 
 import com.example.capstone.domain.User;
-import com.example.capstone.dto.UpdateUserPassword;
-import com.example.capstone.dto.UserInfo;
-import com.example.capstone.dto.AddUser;
-import com.example.capstone.dto.UserLogin;
+import com.example.capstone.dto.*;
 import com.example.capstone.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -111,6 +108,21 @@ public class UserApiController {
         UserInfo userInfo = new UserInfo(user);
 
         return ResponseEntity.ok(userInfo);
+    }
+
+    // 현재 비밀번호 확인
+    @PostMapping("/check-password")
+    public ResponseEntity<Map<String, String>> checkPassword(@RequestBody CheckUserPassword checkUserPassword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = (User) authentication.getPrincipal();  // 현재 로그인한 사용자 가져오기
+
+        // 현재 비밀번호가 일치하는지 확인
+        if (!bCryptPasswordEncoder.matches(checkUserPassword.getCurrentPassword(), user.getUserPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "현재 비밀번호가 일치하지 않습니다."));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "비밀번호가 일치합니다."));
     }
 
     // 비밀번호 변경
