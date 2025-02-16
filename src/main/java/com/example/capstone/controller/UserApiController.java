@@ -81,7 +81,7 @@ public class UserApiController {
 
             if (e.getMessage().contains("존재하지 않는 사용자")) {
                 errorMessage = "존재하지 않는 아이디입니다.";
-            } else if (e.getMessage().contains("자격 증명에 실패하였습니다")) {
+            } else if (e.getMessage().contains("자격 증명에 실패하였습니다") || e.getMessage().contains("Bad credentials")) {
                 errorMessage = "비밀번호가 틀렸습니다.";
             }
 
