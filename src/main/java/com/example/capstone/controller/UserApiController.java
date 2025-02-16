@@ -27,20 +27,6 @@ public class UserApiController {
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    // 로그인 여부 확인 API
-    @GetMapping("/check-login")
-    public ResponseEntity<Map<String, Object>> checkLoginStatus() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // 사용자가 인증되었는지 확인
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("isLoggedIn", false, "message", "로그인되지 않은 사용자입니다."));
-        }
-
-        return ResponseEntity.ok(Map.of("isLoggedIn", true, "message", "로그인된 사용자입니다."));
-    }
-
     // userId 중복 확인 API
     @GetMapping("/check-userid")
     public ResponseEntity<Map<String, String>> checkUserId(@RequestParam String userId) {
@@ -98,6 +84,22 @@ public class UserApiController {
         }
     }
 
+    // 로그아웃 API = WebSecurityConfig에서 처리
+
+    // 로그인 여부 확인 API
+    @GetMapping("/check-login")
+    public ResponseEntity<Map<String, Object>> checkLoginStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 사용자가 인증되었는지 확인
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("isLoggedIn", false, "message", "로그인되지 않은 사용자입니다."));
+        }
+
+        return ResponseEntity.ok(Map.of("isLoggedIn", true, "message", "로그인된 사용자입니다."));
+    }
+
     // 로그인된 사용자 정보 조회 API (비밀번호 제외)
     @GetMapping("/userinfo")
     public ResponseEntity<UserInfo> getUserInfo() {
@@ -110,7 +112,7 @@ public class UserApiController {
         return ResponseEntity.ok(userInfo);
     }
 
-    // 현재 비밀번호 확인
+    // 현재 비밀번호 확인 API
     @PostMapping("/check-password")
     public ResponseEntity<Map<String, String>> checkPassword(@RequestBody CheckUserPassword checkUserPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -125,7 +127,7 @@ public class UserApiController {
         return ResponseEntity.ok(Map.of("message", "비밀번호가 일치합니다."));
     }
 
-    // 비밀번호 변경
+    // 비밀번호 변경 API
     @PutMapping("/update-password")
     public ResponseEntity<Map<String, String>> updatePassword(@RequestBody UpdateUserPassword updateUserPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -144,7 +146,7 @@ public class UserApiController {
         return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
 
-    // 회원 삭제
+    // 회원 삭제 API
     @DeleteMapping("/delete-account")
     public ResponseEntity<Map<String, String>> deleteUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -156,5 +158,4 @@ public class UserApiController {
         return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었습니다."));
     }
 
-    // 로그아웃 API = WebSecurityConfig에서 처리
 }
