@@ -129,7 +129,7 @@ public class UserApiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "현재 비밀번호가 일치하지 않습니다."));
         }
 
-        return ResponseEntity.ok(Map.of("message", "비밀번호가 일치합니다."));
+        return ResponseEntity.ok(Map.of("message", "현재 비밀번호가 일치합니다."));
     }
 
     // 비밀번호 변경 API
