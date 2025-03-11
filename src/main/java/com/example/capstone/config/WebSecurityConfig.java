@@ -34,7 +34,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/check-login", "/check-userid", "/signup", "/login", "/logout").permitAll()
 
                         // 로그인된 사용자만 접근 가능
-                        .requestMatchers("/userinfo", "/check-password", "/update-password", "/delete-account").authenticated()
+                        .requestMatchers("/userinfo", "/check-password", "/update-password", "/delete-account", "/s3/upload", "/s3/delete").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

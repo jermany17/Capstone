@@ -23,6 +23,22 @@ spring:
       hibernate:
         format_sql: true # SQL 쿼리를 보기 좋게 포맷팅하여 출력
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ${AWS_REGION}
+      s3:
+        bucket: ${AWS_S3_BUCKET_NAME}
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB  # 개별 파일 최대 크기
+      max-request-size: 20MB  # 전체 요청 크기
+
 server:
   servlet:
     session:
