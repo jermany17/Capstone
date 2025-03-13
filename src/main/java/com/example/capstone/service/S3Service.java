@@ -10,8 +10,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -68,10 +72,34 @@ public class S3Service {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, "ap-northeast-2", fileName);
     }
 
-    // 파일명 생성 (basePath/UUID_원본파일명)
+    // 파일명 생성
     private String generateFileName(String originalFileName) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")); // 밀리초 단위까지
-        return basePath + "/" + timestamp + "_" + originalFileName;
+        String uuid = UUID.randomUUID().toString().replace("-", ""); // 하이픈 제거한 UUID
+        String hash = generateSHA256(originalFileName + timestamp + uuid).substring(0, 10); // SHA-256 해시값(10자리)
+
+        return String.format("%s/%s_%s_%s", basePath, timestamp, hash, originalFileName);
+    }
+
+    // SHA-256 해시 생성 (파일명 해싱용)
+    private String generateSHA256(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+            // 바이트 배열을 16진수 문자열로 변환
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 해시 생성 오류", e);
+        }
     }
 
     // URL에서 S3 파일 키(경로) 추출
