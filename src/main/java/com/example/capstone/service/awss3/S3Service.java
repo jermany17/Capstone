@@ -1,4 +1,4 @@
-package com.example.capstone.service;
+package com.example.capstone.service.awss3;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,8 +1,8 @@
-package com.example.capstone.service;
+package com.example.capstone.service.auth;
 
-import com.example.capstone.domain.User;
-import com.example.capstone.dto.AddUser;
-import com.example.capstone.repository.UserRepository;
+import com.example.capstone.domain.auth.User;
+import com.example.capstone.dto.auth.AddUser;
+import com.example.capstone.repository.auth.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,7 +18,7 @@ public class UserService {
     // 회원 정보 저장
     public Long save(AddUser dto) {
         User user = User.builder()
-                .nickName(dto.getNickName())
+                .userName(dto.getUserName())
                 .userId(dto.getUserId())
                 .userPassword(bCryptPasswordEncoder.encode(dto.getUserPassword())) // 비밀번호 암호화
                 .build();

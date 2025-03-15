@@ -1,6 +1,6 @@
-package com.example.capstone.controller;
+package com.example.capstone.controller.awss3;
 
-import com.example.capstone.service.S3Service;
+import com.example.capstone.service.awss3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

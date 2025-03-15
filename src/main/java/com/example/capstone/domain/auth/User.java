@@ -1,4 +1,4 @@
-package com.example.capstone.domain;
+package com.example.capstone.domain.auth;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,8 +23,8 @@ public class User implements UserDetails {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "nick_name", nullable = false)
-    private String nickName; // 사용자 이름
+    @Column(name = "user_name", nullable = false)
+    private String userName; // 사용자 이름
 
     @Column(name = "user_id", nullable = false, unique = true)
     private String userId; // 로그인 ID
@@ -40,8 +40,8 @@ public class User implements UserDetails {
 
 
     @Builder
-    public User(String nickName, String userId, String userPassword) {
-        this.nickName = nickName;
+    public User(String userName, String userId, String userPassword) {
+        this.userName = userName;
         this.userId = userId;
         this.userPassword = userPassword;
         this.createAt = LocalDateTime.now();
@@ -59,14 +59,18 @@ public class User implements UserDetails {
         this.updateAt = LocalDateTime.now(); // 비밀번호 변경 시 updateAt 자동 업데이트
     }
 
+    public String getUserName() { // 이건 User에서 정의한 메서드
+        return this.userName; // getUsername()과의 충돌 방지
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() { // 사용자의 권한 목록
         return List.of(new SimpleGrantedAuthority("user"));
     }
 
     @Override
-    public String getUsername() {
-        return userId;
+    public String getUsername() { // 이건 UserDetails 인터페이스에 정의되어있는 메서드
+        return userId; // 아이디로 userId 사용한다는 의미
     }
 
     @Override

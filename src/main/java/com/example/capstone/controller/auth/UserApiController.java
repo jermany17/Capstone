@@ -1,8 +1,8 @@
-package com.example.capstone.controller;
+package com.example.capstone.controller.auth;
 
-import com.example.capstone.domain.User;
-import com.example.capstone.dto.*;
-import com.example.capstone.service.UserService;
+import com.example.capstone.domain.auth.User;
+import com.example.capstone.dto.auth.*;
+import com.example.capstone.service.auth.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

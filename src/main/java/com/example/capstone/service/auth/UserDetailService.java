@@ -1,7 +1,7 @@
-package com.example.capstone.service;
+package com.example.capstone.service.auth;
 
-import com.example.capstone.domain.User;
-import com.example.capstone.repository.UserRepository;
+import com.example.capstone.domain.auth.User;
+import com.example.capstone.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
