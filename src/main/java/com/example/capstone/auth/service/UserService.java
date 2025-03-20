@@ -1,8 +1,8 @@
-package com.example.capstone.service.auth;
+package com.example.capstone.auth.service;
 
-import com.example.capstone.domain.auth.User;
-import com.example.capstone.dto.auth.AddUser;
-import com.example.capstone.repository.auth.UserRepository;
+import com.example.capstone.auth.domain.User;
+import com.example.capstone.auth.dto.AddUser;
+import com.example.capstone.auth.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

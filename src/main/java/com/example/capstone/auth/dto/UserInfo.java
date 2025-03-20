@@ -1,6 +1,6 @@
-package com.example.capstone.dto.auth;
+package com.example.capstone.auth.dto;
 
-import com.example.capstone.domain.auth.User;
+import com.example.capstone.auth.domain.User;
 import lombok.Getter;
 import lombok.Setter;
 

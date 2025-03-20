@@ -1,6 +1,6 @@
 package com.example.capstone.config;
 
-import com.example.capstone.service.auth.UserDetailService;
+import com.example.capstone.auth.service.UserDetailService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

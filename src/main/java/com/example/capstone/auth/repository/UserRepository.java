@@ -1,6 +1,6 @@
-package com.example.capstone.repository.auth;
+package com.example.capstone.auth.repository;
 
-import com.example.capstone.domain.auth.User;
+import com.example.capstone.auth.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

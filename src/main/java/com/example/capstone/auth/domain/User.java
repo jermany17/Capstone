@@ -1,4 +1,4 @@
-package com.example.capstone.domain.auth;
+package com.example.capstone.auth.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
