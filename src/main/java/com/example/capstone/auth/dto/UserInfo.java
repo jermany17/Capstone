@@ -9,12 +9,16 @@ import lombok.Setter;
 public class UserInfo {
     private String userName;
     private String userId;
+    private String userBirthday;
+    private String userGender;
     private String createAt;
     private String updateAt;
 
     public UserInfo(User user) {
         this.userName = user.getUserName();
         this.userId = user.getUserId();
+        this.userBirthday = user.getUserBirthday().toString();
+        this.userGender = user.getUserGender();
         this.createAt = user.getCreateAt().toString();
         this.updateAt = user.getUpdateAt().toString();
     }
