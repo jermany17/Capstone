@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -32,6 +33,12 @@ public class User implements UserDetails {
     @Column(name = "user_password", nullable = false)
     private String userPassword; // 비밀번호
 
+    @Column(name = "user_birthday", nullable = false)
+    private LocalDate userBirthday;
+
+    @Column(name = "user_gender", nullable = false)
+    private String userGender;
+
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createAt; // 생성일시 (최초 생성 이후 변경되지 않음)
 
@@ -40,10 +47,12 @@ public class User implements UserDetails {
 
 
     @Builder
-    public User(String userName, String userId, String userPassword) {
+    public User(String userName, String userId, String userPassword, LocalDate userBirthday, String userGender) {
         this.userName = userName;
         this.userId = userId;
         this.userPassword = userPassword;
+        this.userBirthday = userBirthday;
+        this.userGender = userGender;
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
