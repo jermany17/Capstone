@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class PostInfo {
     private final Long id;
     private final String title;
+    private final String userId;
     private final String userName;
     private final List<String> images;
     private final String content;
@@ -23,6 +24,7 @@ public class PostInfo {
     public PostInfo(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
+        this.userId = post.getUserId();
         this.userName = post.getUserName();
         this.images = post.getImages();
         this.content = post.getContent();
