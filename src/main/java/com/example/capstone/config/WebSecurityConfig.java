@@ -38,7 +38,8 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/userinfo", "/check-password", "/update-password", "/delete-account",
                                 "/s3/upload", "/s3/delete",
-                                "/posts/create", "/posts/delete/**").authenticated()
+                                "/posts/create", "/posts/delete/**",
+                                "/hospital/**" ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
