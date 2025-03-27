@@ -19,7 +19,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Map<String, ?>> createPost(
             @RequestPart("title") String title,
             @RequestPart("content") String content,
@@ -30,17 +30,15 @@ public class PostController {
             return ResponseEntity.badRequest().body(Map.of("message", "제목은 1자 이상 20자 이하여야 합니다."));
         }
 
-        if (files == null || files.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "이미지를 최소 1개 이상 업로드해야 합니다."));
-        }
+        if (files != null) {
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) {
+                    return ResponseEntity.badRequest().body(Map.of("message", "비어 있는 이미지 파일이 포함되어 있습니다."));
+                }
 
-        for (MultipartFile file : files) {
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "비어 있는 이미지 파일이 포함되어 있습니다."));
-            }
-
-            if (file.getSize() > 10 * 1024 * 1024) {
-                return ResponseEntity.badRequest().body(Map.of("message", "이미지는 10MB를 초과할 수 없습니다."));
+                if (file.getSize() > 10 * 1024 * 1024) {
+                    return ResponseEntity.badRequest().body(Map.of("message", "이미지는 10MB를 초과할 수 없습니다."));
+                }
             }
         }
 
@@ -54,7 +52,7 @@ public class PostController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/readall")
     public ResponseEntity<List<PostInfo>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }

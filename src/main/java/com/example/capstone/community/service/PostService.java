@@ -30,9 +30,11 @@ public class PostService {
     public Long createPost(String title, String content, List<MultipartFile> files, Authentication authentication) throws IOException {
         List<String> imageUrls = new ArrayList<>();
 
-        for (MultipartFile file : files) {
-            String url = s3Service.uploadImage(file);
-            imageUrls.add(url);
+        if (files != null) {
+            for (MultipartFile file : files) {
+                String url = s3Service.uploadImage(file);
+                imageUrls.add(url);
+            }
         }
 
         User user = (User) authentication.getPrincipal(); // 현재 로그인한 사용자 가져오기
