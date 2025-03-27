@@ -57,4 +57,31 @@ public class PostService {
                 .map(PostInfo::new)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public PostInfo getPostById(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+        return new PostInfo(post);
+    }
+
+    @Transactional
+    public void deletePost(Long id, Authentication authentication) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+
+        User user = (User) authentication.getPrincipal();
+        if (!post.getUserId().equals(user.getUserId())) {
+            throw new SecurityException("게시물 삭제 권한이 없습니다.");
+        }
+
+        // S3에 저장된 이미지가 있다면 삭제
+        if (post.getImages() != null) {
+            for (String imageUrl : post.getImages()) {
+                s3Service.deleteImage(imageUrl);
+            }
+        }
+
+        postRepository.delete(post);
+    }
 }

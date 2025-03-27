@@ -52,8 +52,30 @@ public class PostController {
         }
     }
 
-    @GetMapping("/readall")
+    @GetMapping("/read-all")
     public ResponseEntity<List<PostInfo>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    @GetMapping("/read-one/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+        try {
+            PostInfo postInfo = postService.getPostById(id);
+            return ResponseEntity.ok(postInfo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
+        try {
+            postService.deletePost(id, authentication);
+            return ResponseEntity.ok(Map.of("message", "게시물이 성공적으로 삭제되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("message", e.getMessage()));
+        }
     }
 }

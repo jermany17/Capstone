@@ -31,10 +31,14 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // 로그인 없이 접근 가능
-                        .requestMatchers("/check-login", "/check-userid", "/signup", "/login", "/logout").permitAll()
+                        .requestMatchers("/check-login", "/check-userid", "/signup", "/login", "/logout",
+                                "posts/read-all", "/posts/read-one/**").permitAll()
 
                         // 로그인된 사용자만 접근 가능
-                        .requestMatchers("/userinfo", "/check-password", "/update-password", "/delete-account", "/s3/upload", "/s3/delete", "/posts").authenticated()
+                        .requestMatchers(
+                                "/userinfo", "/check-password", "/update-password", "/delete-account",
+                                "/s3/upload", "/s3/delete",
+                                "/posts/create", "/posts/delete/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
