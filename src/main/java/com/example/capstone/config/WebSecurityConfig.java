@@ -39,8 +39,8 @@ public class WebSecurityConfig {
                                 "/userinfo", "/check-password", "/update-password", "/delete-account",
                                 "/s3/upload", "/s3/delete",
                                 "/posts/create", "/posts/delete/**",
-                                "/hospital/**" ).authenticated()
-                        .anyRequest().authenticated()
+                                "/hospital/**", "/skin-diagnosis" ).authenticated()
+                        .anyRequest().denyAll()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> { // 인증되지 않은 사용자가 보호된 API에 접근했을 때
