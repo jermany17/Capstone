@@ -25,7 +25,7 @@ public class DiagnosisService {
     public DiagnosisResultResponse diagnose(MultipartFile file) {
 
         //AI 서버로 이미지 전송 (AI 서버 지금 무료 이용 중이라 수시로 바뀜)
-        String aiUrl = "https://4dfc-223-195-38-166.ngrok-free.app/disease"; //AI 서버 진단 API 주소
+        String aiUrl = "https://59ef-223-195-38-166.ngrok-free.app/disease"; //AI 서버 진단 API 주소
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA); //전송할 데이터 multipart/form-data 명시
 
