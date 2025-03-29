@@ -15,7 +15,7 @@ public class DiseaseTreatment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 45, nullable = false)
+    @Column(length = 45, nullable = false, unique = true)
     private String disease;
 
     @Column(columnDefinition = "TEXT", nullable = false)

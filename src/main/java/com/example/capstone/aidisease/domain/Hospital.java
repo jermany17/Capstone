@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 public class Hospital {
 
     @Id
-    @Column(length = 10)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "location", length = 10, nullable = false, unique = true)
     private String location;
 
     @Column(name = "hospital1", nullable = false)
