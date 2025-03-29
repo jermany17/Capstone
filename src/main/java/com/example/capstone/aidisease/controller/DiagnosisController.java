@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 import java.util.Map;
 
@@ -33,6 +35,19 @@ public class DiagnosisController {
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("message", "이미지는 10MB를 초과할 수 없습니다."));
+        }
+
+        //이미지 해상도 검사
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+            if (image == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "올바르지 않은 이미지 형식입니다."));
+            }
+            if (image.getWidth() < 200 || image.getHeight() < 200) {
+                return ResponseEntity.badRequest().body(Map.of("message", "이미지 해상도는 최소 300x300 이상이어야 합니다."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이미지 해상도 검사 중 오류가 발생했습니다."));
         }
 
         //피부질환진단
