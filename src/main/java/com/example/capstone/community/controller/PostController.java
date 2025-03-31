@@ -19,6 +19,7 @@ public class PostController {
 
     private final PostService postService;
 
+    // 게시물 생성
     @PostMapping("/create")
     public ResponseEntity<Map<String, ?>> createPost(
             @RequestPart("title") String title,
@@ -52,11 +53,16 @@ public class PostController {
         }
     }
 
-    @GetMapping("/read-all")
-    public ResponseEntity<List<PostInfo>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    // 게시물 조회(size, page)
+    @GetMapping("/read-latest")
+    public ResponseEntity<List<PostInfo>> getAllPostsPaged(
+            @RequestParam("size") int size,
+            @RequestParam("page") int page
+    ) {
+        return ResponseEntity.ok(postService.getLatestPostsPaged(page, size));
     }
 
+    // 게시물 단일 조회
     @GetMapping("/read-one/{id}")
     public ResponseEntity<?> getPostById(@PathVariable Long id) {
         try {
@@ -67,6 +73,7 @@ public class PostController {
         }
     }
 
+    // 게시물 삭제
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
         try {

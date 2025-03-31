@@ -7,16 +7,17 @@ import com.example.capstone.community.repository.PostRepository;
 import com.example.capstone.awss3.service.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -51,9 +52,11 @@ public class PostService {
     }
 
     @Transactional
-    public List<PostInfo> getAllPosts() {
+    public List<PostInfo> getLatestPostsPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createAt"));
+        Page<Post> postPage = postRepository.findAllByOrderByCreateAtDesc(pageable);
 
-        return postRepository.findAll().stream()
+        return postPage.getContent().stream()
                 .map(PostInfo::new)
                 .collect(Collectors.toList());
     }
