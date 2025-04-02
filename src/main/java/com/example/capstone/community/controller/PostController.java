@@ -85,4 +85,29 @@ public class PostController {
             return ResponseEntity.status(403).body(Map.of("message", e.getMessage()));
         }
     }
+
+    // 좋아요 등록 & 취소
+    @PostMapping("/like/{id}")
+    public ResponseEntity<?> toggleLike(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        try {
+            boolean liked = postService.toggleLike(id, authentication);
+            return ResponseEntity.ok(Map.of("message", liked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // 좋아요 개수
+    @GetMapping("/like-count/{id}")
+    public ResponseEntity<?> getLikeCount(@PathVariable Long id) {
+        try {
+            int count = postService.getLikeCount(id);
+            return ResponseEntity.ok(Map.of("likeCount", count));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        }
+    }
 }

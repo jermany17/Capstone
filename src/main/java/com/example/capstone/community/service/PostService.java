@@ -87,4 +87,30 @@ public class PostService {
 
         postRepository.delete(post);
     }
+
+    @Transactional
+    public boolean toggleLike(Long postId, Authentication authentication) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+
+        User user = (User) authentication.getPrincipal();
+        String userId = user.getUserId();
+
+        List<String> likes = post.getLikes();
+
+        if (likes.contains(userId)) {
+            likes.remove(userId);  // 좋아요 취소
+            return false;
+        } else {
+            likes.add(userId);     // 좋아요 추가
+            return true;
+        }
+    }
+
+    @Transactional
+    public int getLikeCount(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+        return post.getLikes().size();
+    }
 }
