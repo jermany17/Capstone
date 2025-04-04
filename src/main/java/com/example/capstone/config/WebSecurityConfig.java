@@ -38,8 +38,9 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/userinfo", "/check-password", "/update-password", "/delete-account",
                                 "/s3/upload", "/s3/delete",
-                                "/posts/create", "/posts/delete/**", "/posts/like/**",
-                                "/hospital/**", "/skin-diagnosis" ).authenticated()
+                                "/hospital/**", "/skin-diagnosis",
+                                "skin-analysis/**", "/cosmetic-recommend",
+                                "/posts/create", "/posts/delete/**", "/posts/like/**" ).authenticated()
                         .anyRequest().denyAll()
                 )
                 .exceptionHandling(exception -> exception
