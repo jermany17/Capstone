@@ -54,6 +54,38 @@ public class S3Service {
         return getFileUrl(fileName); // 업로드된 파일의 URL 반환
     }
 
+    // 경로를 직접 지정해서 이미지 업로드 (피부 미용 - 정면, 위, 아래 등 명시하기 위해)
+    public String uploadImageWithCustomPath(MultipartFile file, String customPath) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("파일이 비어 있습니다.");
+        }
+
+        if (file.getSize() > 10 * 1024 * 1024) {
+            throw new IllegalArgumentException("파일 크기가 너무 큽니다. (최대 10MB)");
+        }
+
+        // 파일 확장자 유지
+        String originalFileName = file.getOriginalFilename();
+        String extension = originalFileName != null && originalFileName.contains(".")
+                ? originalFileName.substring(originalFileName.lastIndexOf("."))
+                : "";
+
+        // 최종 S3에 저장될 경로 (예: skin-analysis/userId/analysisId/top.jpg)
+        String fileName = customPath + extension;
+
+        // S3에 파일 업로드
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(fileName)
+                        .acl(ObjectCannedACL.PUBLIC_READ)
+                        .contentType(file.getContentType())
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        log.info("커스텀 경로로 파일 업로드 성공: {}", fileName);
+        return getFileUrl(fileName); // 전체 URL 반환
+    }
+
     // S3에서 이미지 삭제 (URL 전체 경로 입력)
     public void deleteImage(String fileUrl) {
         String fileKey = extractFileKeyFromUrl(fileUrl); // URL에서 파일 키(경로) 추출
