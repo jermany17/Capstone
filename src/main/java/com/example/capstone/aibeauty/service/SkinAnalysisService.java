@@ -67,10 +67,7 @@ public class SkinAnalysisService {
         }
 
         // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
-        repository.deleteByUserIdAndCreatedAtBetween(userId, startOfDay, endOfDay);
+        deleteExistingResultIfExists(userId, LocalDate.now());
 
         // 유효성 검사 통과 후 s3 업로드 수행
         for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
@@ -140,6 +137,21 @@ public class SkinAnalysisService {
         } catch (IOException e) {
             throw new IllegalArgumentException("이미지 해상도 검사 중 오류가 발생했습니다.");
         }
+    }
+
+    // 같은 날의 기존 분석 결과가 이미 존재하는 경우, 해당 결과의 이미지들을 S3에서 모두 삭제하고 DB에서도 해당 결과 삭제
+    private void deleteExistingResultIfExists(String userId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        repository.findByUserIdAndCreatedAtBetween(userId, startOfDay, endOfDay)
+                .ifPresent(existingResult -> {
+                    // 기존 분석 결과 있으면 이미지 URL들 순회하며 S3에서 삭제
+                    for (String url : existingResult.getImageUrls()) {
+                        s3Service.deleteImage(url);
+                    }
+                    repository.delete(existingResult); // DB 분석 결과 삭제
+                });
     }
 
     // AI 서버 호출 메서드

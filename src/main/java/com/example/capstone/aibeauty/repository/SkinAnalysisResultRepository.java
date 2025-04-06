@@ -11,6 +11,6 @@ public interface SkinAnalysisResultRepository extends JpaRepository<SkinAnalysis
     // 분석 id로 조회 (검사 결과 조회용)
     Optional<SkinAnalysisResult> findByAnalysisId(String analysisId);
 
-    // 오늘 날짜에 이미 있는 기존 분석 결과 삭제 (최신 분석 결과만 유지하기 위함)
-    void deleteByUserIdAndCreatedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
+    // 지정한 사용자 id와 지정한 날짜에 해당하는 피부 분석 결과 조회
+    Optional<SkinAnalysisResult> findByUserIdAndCreatedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
 }
