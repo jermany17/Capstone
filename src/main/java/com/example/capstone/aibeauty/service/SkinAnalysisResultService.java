@@ -18,7 +18,7 @@ public class SkinAnalysisResultService {
     // 분석 결과 id를 기반으로 DB에서 데이터를 조회하고 이를 응답 DTO로 변환하여 반환
     public SkinAnalysisResponse getAnalysisResult(String analysisId) {
         SkinAnalysisResult result = repository.findByAnalysisId(analysisId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 분석 결과를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 id의 분석 결과를 찾을 수 없습니다."));
 
         return fromEntity(result);
     }
