@@ -34,72 +34,78 @@ public class SkinAnalysisResult {
     private List<String> imageUrls = new ArrayList<>();
 
     //분석 결과 19개
-    @Column(name = "forehead_wrinkle")
+    @Column(name = "forehead_wrinkle", nullable = false)
     private int foreheadWrinkle;
 
-    @Column(name = "forehead_pigmentation")
+    @Column(name = "forehead_pigmentation", nullable = false)
     private int foreheadPigmentation;
 
-    @Column(name = "forehead_moisture")
+    @Column(name = "forehead_moisture", nullable = false)
     private int foreheadMoisture;
 
-    @Column(name = "forehead_elasticity")
+    @Column(name = "forehead_elasticity", nullable = false)
     private int foreheadElasticity;
 
-    @Column(name = "glabella_wrinkle")
+    @Column(name = "glabella_wrinkle", nullable = false)
     private int glabellaWrinkle;
 
-    @Column(name = "lefteye_wrinkle")
+    @Column(name = "lefteye_wrinkle", nullable = false)
     private int lefteyeWrinkle;
 
-    @Column(name = "righteye_wrinkle")
+    @Column(name = "righteye_wrinkle", nullable = false)
     private int righteyeWrinkle;
 
-    @Column(name = "leftcheek_pigmentation")
+    @Column(name = "leftcheek_pigmentation", nullable = false)
     private int leftcheekPigmentation;
 
-    @Column(name = "leftcheek_pore")
+    @Column(name = "leftcheek_pore", nullable = false)
     private int leftcheekPore;
 
-    @Column(name = "leftcheek_moisture")
+    @Column(name = "leftcheek_moisture", nullable = false)
     private int leftcheekMoisture;
 
-    @Column(name = "leftcheek_elasticity")
+    @Column(name = "leftcheek_elasticity", nullable = false)
     private int leftcheekElasticity;
 
-    @Column(name = "rightcheek_pigmentation")
+    @Column(name = "rightcheek_pigmentation", nullable = false)
     private int rightcheekPigmentation;
 
-    @Column(name = "rightcheek_pore")
+    @Column(name = "rightcheek_pore", nullable = false)
     private int rightcheekPore;
 
-    @Column(name = "rightcheek_moisture")
+    @Column(name = "rightcheek_moisture", nullable = false)
     private int rightcheekMoisture;
 
-    @Column(name = "rightcheek_elasticity")
+    @Column(name = "rightcheek_elasticity", nullable = false)
     private int rightcheekElasticity;
 
-    @Column(name = "lip_dryness")
+    @Column(name = "lip_dryness", nullable = false)
     private int lipDryness;
 
-    @Column(name = "jawline_sagging")
+    @Column(name = "jawline_sagging", nullable = false)
     private int jawlineSagging;
 
-    @Column(name = "chin_moisture")
+    @Column(name = "chin_moisture", nullable = false)
     private int chinMoisture;
 
-    @Column(name = "chin_elasticity")
+    @Column(name = "chin_elasticity", nullable = false)
     private int chinElasticity;
 
-    //total 분석 결과 3개
-    @Column(name = "total_wrinkle")
+    //total 분석 결과 5개
+    @Column(name = "total_wrinkle", nullable = false)
     private int totalWrinkle;
 
-    @Column(name = "total_pigmentation")
+    @Column(name = "total_pigmentation", nullable = false)
     private int totalPigmentation;
 
-    @Column(name = "total_pore")
+    @Column(name = "total_pore", nullable = false)
     private int totalPore;
+
+    @Column(name = "total_moisture", nullable = false)
+    private int totalMoisture;
+
+    @Column(name = "total_elasticity", nullable = false)
+    private int totalElasticity;
 
     //피부분석 날짜
     @Column(name = "created_at")
@@ -112,7 +118,8 @@ public class SkinAnalysisResult {
                               int leftcheekPigmentation, int leftcheekPore, int leftcheekMoisture, int leftcheekElasticity,
                               int rightcheekPigmentation, int rightcheekPore, int rightcheekMoisture, int rightcheekElasticity,
                               int lipDryness, int jawlineSagging, int chinMoisture, int chinElasticity,
-                              int totalWrinkle, int totalPigmentation, int totalPore, LocalDateTime createdAt) {
+                              int totalWrinkle, int totalPigmentation, int totalPore, int totalMoisture, int totalElasticity,
+                              LocalDateTime createdAt) {
 
         this.userId = userId;
         this.analysisId = analysisId;
@@ -139,6 +146,8 @@ public class SkinAnalysisResult {
         this.totalWrinkle = totalWrinkle;
         this.totalPigmentation = totalPigmentation;
         this.totalPore = totalPore;
+        this.totalMoisture = totalMoisture;
+        this.totalElasticity = totalElasticity;
         this.createdAt = createdAt;
     }
 }

@@ -56,7 +56,7 @@ public class SkinAnalysisCompareController {
         }
     }
 
-    // 평균 점수 계산 메서드 (total 값 3개 빼고 19개 항목으로 계산)
+    // 평균 점수 계산 메서드 (total 값 5개 빼고 19개 항목으로 계산)
     private double calculateAverageScore(SkinAnalysisResponse res) {
         int sum =
                 res.getForeheadWrinkle() + res.getForeheadPigmentation() +

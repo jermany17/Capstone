@@ -34,6 +34,8 @@ public class SkinAnalysisResponse {
     private int totalWrinkle;
     private int totalPigmentation;
     private int totalPore;
+    private int totalMoisture;
+    private int totalElasticity;
 
     private LocalDateTime createdAt;
 }

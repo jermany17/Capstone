@@ -60,6 +60,8 @@ public class SkinAnalysisResultService {
                 .totalWrinkle(result.getTotalWrinkle())
                 .totalPigmentation(result.getTotalPigmentation())
                 .totalPore(result.getTotalPore())
+                .totalMoisture(result.getTotalMoisture())
+                .totalElasticity(result.getTotalElasticity())
                 .createdAt(result.getCreatedAt())
                 .build();
     }
