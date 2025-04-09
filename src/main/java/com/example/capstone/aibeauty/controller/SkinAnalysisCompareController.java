@@ -14,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,6 +23,22 @@ import java.util.Map;
 public class SkinAnalysisCompareController {
 
     private final SkinAnalysisResultService resultService;
+
+    @GetMapping("/date")
+    public ResponseEntity<?> getAnalysisDates(Authentication authentication) {
+        try {
+            String userId = ((User) authentication.getPrincipal()).getUserId();
+            List<LocalDate> dates = resultService.getAnalysisDates(userId);
+
+            if (dates.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "피부 진단 결과가 존재하지 않습니다."));
+            }
+
+            return ResponseEntity.ok(Map.of("date", dates));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "날짜 목록을 불러오는 데 실패했습니다."));
+        }
+    }
 
     @GetMapping("/compare")
     public ResponseEntity<?> compare(

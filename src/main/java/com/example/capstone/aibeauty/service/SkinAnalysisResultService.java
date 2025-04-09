@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,17 @@ public class SkinAnalysisResultService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 id의 분석 결과를 찾을 수 없습니다."));
 
         return fromEntity(result);
+    }
+
+    // 사용자 id를 기반으로 피부 분석 결과의 날짜 목록을 반환
+    public List<LocalDate> getAnalysisDates(String userId) {
+        List<SkinAnalysisResult> results = repository.findAllByUserId(userId);
+
+        return results.stream()
+                .map(r -> r.getCreatedAt().toLocalDate())  // LocalDate로 변환
+                .distinct()  // 중복 제거
+                .sorted(Comparator.reverseOrder())    // 오름차순 정렬
+                .toList();
     }
 
     // 사용자 id와 특정 날짜를 기반으로 해당 날짜에 수행된 피부 분석 결과를 조회하고 응답 DTO로 반환
