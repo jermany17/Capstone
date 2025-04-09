@@ -89,6 +89,8 @@ public class SkinAnalysisService {
                 .totalWrinkle(aiResult.get("totalWrinkle"))
                 .totalPigmentation(aiResult.get("totalPigmentation"))
                 .totalPore(aiResult.get("totalPore"))
+                .totalMoisture(aiResult.get("totalMoisture"))
+                .totalElasticity(aiResult.get("totalElasticity"))
                 .foreheadWrinkle(aiResult.get("foreheadWrinkle"))
                 .foreheadPigmentation(aiResult.get("foreheadPigmentation"))
                 .foreheadMoisture(aiResult.get("foreheadMoisture"))

@@ -26,13 +26,13 @@ public class CosmeticProduct {
     @Column(name = "product1", nullable = false, length = 100)
     private String product1;
 
-    @Column(name = "product1_image", nullable = false)
+    @Column(name = "product1_image", nullable = false, length = 1000)
     private String product1Image;
 
     @Column(name = "product1_price", nullable = false)
     private int product1Price;
 
-    @Column(name = "product1_link", nullable = false)
+    @Column(name = "product1_link", nullable = false, length = 1000)
     private String product1Link;
 
     // 제품 2
