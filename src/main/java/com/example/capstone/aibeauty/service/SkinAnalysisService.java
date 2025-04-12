@@ -50,7 +50,7 @@ public class SkinAnalysisService {
         // 이미지 없는 경우 검사 = null 체크 (getKey()로 어디 각도 이미지 안 들어왔는지 에러 메시지에 표시)
         for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
             if (entry.getValue() == null) {
-                throw new IllegalArgumentException(entry.getKey() + " 이미지가 null입니다.");
+                throw new IllegalArgumentException("이미지 데이터 수신 과정에서 오류가 발생했습니다");
             }
         }
 
