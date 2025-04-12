@@ -75,7 +75,7 @@ public class SkinAnalysisService {
                 imageUrlMap.put(key, s3Url);
             }
         } catch (IOException | RuntimeException e) { // s3Service에서 발생할 수 있는 오류
-            throw new RuntimeException("S3 이미지 업로드 중 오류가 발생했습니다." + e.getMessage(), e);
+            throw new RuntimeException("S3 이미지 업로드 중 오류가 발생했습니다.");
         }
 
         // AI 서버에 이미지 분석 요청
