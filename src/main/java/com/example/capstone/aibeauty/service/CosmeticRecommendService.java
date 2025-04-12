@@ -15,15 +15,13 @@ public class CosmeticRecommendService {
 
     private final CosmeticProductRepository productRepository;
 
-    // 총합 점수를 기반으로 5가지 카테고리(주름, 색소침착, 모공, 수분, 탄력)에 대해 추천 화장품을 가져옴
+    // 총합 점수를 기반으로 5가지 카테고리(주름, 색소침착, 모공)에 대해 추천 화장품을 가져옴
     // 각 항목은 점수에 따라 "low" 또는 "high"
     public List<CosmeticRecommendResponse> recommend(TotalScoreRequest request) {
         return List.of(
                 getRecommendation("주름", request.getTotalWrinkle() <= 13 ? "low" : "high"),
                 getRecommendation("색소침착", request.getTotalPigmentation() <= 7 ? "low" : "high"),
-                getRecommendation("모공", request.getTotalPore() <= 5 ? "low" : "high"),
-                getRecommendation("수분", request.getTotalMoisture() <= 20 ? "low" : "high"),
-                getRecommendation("탄력", request.getTotalElasticity() <= 20 ? "low" : "high")
+                getRecommendation("모공", request.getTotalPore() <= 5 ? "low" : "high")
         );
     }
 

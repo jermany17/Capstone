@@ -73,19 +73,15 @@ public class SkinAnalysisCompareController {
         }
     }
 
-    // 평균 점수 계산 메서드 (total 값 5개 빼고 19개 항목으로 계산)
+    // 평균 점수 계산 메서드 (total 값 3개 빼고 11개 항목으로 계산)
     private double calculateAverageScore(SkinAnalysisResponse res) {
         int sum =
                 res.getForeheadWrinkle() + res.getForeheadPigmentation() +
-                        res.getForeheadMoisture() + res.getForeheadElasticity() +
                         res.getGlabellaWrinkle() + res.getLefteyeWrinkle() + res.getRighteyeWrinkle() +
                         res.getLeftcheekPigmentation() + res.getLeftcheekPore() +
-                        res.getLeftcheekMoisture() + res.getLeftcheekElasticity() +
                         res.getRightcheekPigmentation() + res.getRightcheekPore() +
-                        res.getRightcheekMoisture() + res.getRightcheekElasticity() +
-                        res.getLipDryness() + res.getJawlineSagging() +
-                        res.getChinMoisture() + res.getChinElasticity();
+                        res.getLipDryness() + res.getJawlineSagging();
 
-        return Math.round((sum / 19.0) * 10.0) / 10.0;  // 소수점 1자리 반올림
+        return Math.round((sum / 11.0) * 10.0) / 10.0;  // 소수점 1자리 반올림
     }
 }
