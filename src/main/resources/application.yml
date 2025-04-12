@@ -36,8 +36,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB  # 개별 파일 최대 크기
-      max-request-size: 70MB  # 전체 요청 최대 크기 (파일 7개 처리 가능하도록)
+      max-file-size: 15MB  # 개별 파일 최대 크기
+      max-request-size: 45MB  # 전체 요청 최대 크기 (파일 7개 처리 가능하도록)
 
 server:
   servlet:
