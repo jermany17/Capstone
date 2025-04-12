@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -41,15 +41,11 @@ public class SkinAnalysisService {
         String userId = user.getUserId(); // 현재 로그인 되어 있는 사용자
         String analysisId = randomUUID().toString(); // 분석 결과 고유 id 생성
 
-        // 이미지 요청 정보를 Map으로 구성 (정면, 위, 아래 등)
+        // 이미지 요청 정보를 Map으로 구성 (정면, 좌측, 우측)
         Map<String, MultipartFile> imageMap = new LinkedHashMap<>();
-        imageMap.put("top", request.getTop());
         imageMap.put("front", request.getFront());
-        imageMap.put("bottom", request.getBottom());
-        imageMap.put("left15", request.getLeft15());
-        imageMap.put("left30", request.getLeft30());
-        imageMap.put("right15", request.getRight15());
-        imageMap.put("right30", request.getRight30());
+        imageMap.put("left", request.getLeft());
+        imageMap.put("right", request.getRight());
 
         // 이미지 없는 경우 검사 = null 체크 (getKey()로 어디 각도 이미지 안 들어왔는지 에러 메시지에 표시)
         for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
@@ -58,7 +54,7 @@ public class SkinAnalysisService {
             }
         }
 
-        // 업로드된 이미지의 S3 URL을 담을 Map = (정면, 위, 아래 등)이랑 이미지 URL 을 키-값 쌍으로 저장
+        // 업로드된 이미지의 S3 URL을 담을 Map = (정면, 좌측, 우측)이랑 이미지 URL 을 키-값 쌍으로 저장
         Map<String, String> imageUrlMap = new LinkedHashMap<>();
 
         // 모든 이미지 유효성 검사 먼저 수행
@@ -69,13 +65,17 @@ public class SkinAnalysisService {
         // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
         deleteExistingResultIfExists(userId, LocalDate.now());
 
-        // 유효성 검사 통과 후 s3 업로드 수행
-        for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
-            String key = entry.getKey();
-            MultipartFile file = entry.getValue();
-            String customPath = String.format("skin-analysis/%s/%s/%s", userId, analysisId, key); // 경로 직접 지정
-            String s3Url = s3Service.uploadImageWithCustomPath(file, customPath);
-            imageUrlMap.put(key, s3Url);
+        try {
+            // 유효성 검사 통과 후 s3 업로드 수행
+            for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
+                String key = entry.getKey();
+                MultipartFile file = entry.getValue();
+                String customPath = String.format("skin-analysis/%s/%s/%s", userId, analysisId, key); // 경로 직접 지정
+                String s3Url = s3Service.uploadImageWithCustomPath(file, customPath);
+                imageUrlMap.put(key, s3Url);
+            }
+        } catch (IOException | RuntimeException e) { // s3Service에서 발생할 수 있는 오류
+            throw new RuntimeException("S3 이미지 업로드 중 오류가 발생했습니다." + e.getMessage(), e);
         }
 
         // AI 서버에 이미지 분석 요청
@@ -89,27 +89,18 @@ public class SkinAnalysisService {
                 .totalWrinkle(aiResult.get("totalWrinkle"))
                 .totalPigmentation(aiResult.get("totalPigmentation"))
                 .totalPore(aiResult.get("totalPore"))
-                .totalMoisture(aiResult.get("totalMoisture"))
-                .totalElasticity(aiResult.get("totalElasticity"))
+                .skinAge(aiResult.get("skinAge"))
                 .foreheadWrinkle(aiResult.get("foreheadWrinkle"))
                 .foreheadPigmentation(aiResult.get("foreheadPigmentation"))
-                .foreheadMoisture(aiResult.get("foreheadMoisture"))
-                .foreheadElasticity(aiResult.get("foreheadElasticity"))
                 .glabellaWrinkle(aiResult.get("glabellaWrinkle"))
                 .lefteyeWrinkle(aiResult.get("lefteyeWrinkle"))
                 .righteyeWrinkle(aiResult.get("righteyeWrinkle"))
                 .leftcheekPigmentation(aiResult.get("leftcheekPigmentation"))
                 .leftcheekPore(aiResult.get("leftcheekPore"))
-                .leftcheekMoisture(aiResult.get("leftcheekMoisture"))
-                .leftcheekElasticity(aiResult.get("leftcheekElasticity"))
                 .rightcheekPigmentation(aiResult.get("rightcheekPigmentation"))
                 .rightcheekPore(aiResult.get("rightcheekPore"))
-                .rightcheekMoisture(aiResult.get("rightcheekMoisture"))
-                .rightcheekElasticity(aiResult.get("rightcheekElasticity"))
                 .lipDryness(aiResult.get("lipDryness"))
                 .jawlineSagging(aiResult.get("jawlineSagging"))
-                .chinMoisture(aiResult.get("chinMoisture"))
-                .chinElasticity(aiResult.get("chinElasticity"))
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -148,11 +139,16 @@ public class SkinAnalysisService {
 
         repository.findByUserIdAndCreatedAtBetween(userId, startOfDay, endOfDay)
                 .ifPresent(existingResult -> {
-                    // 기존 분석 결과 있으면 이미지 URL들 순회하며 S3에서 삭제
-                    for (String url : existingResult.getImageUrls()) {
-                        s3Service.deleteImage(url);
+                    try {
+                        // 기존 분석 결과 있으면 이미지 URL들 순회하며 S3에서 삭제
+                        for (String url : existingResult.getImageUrls()) {
+                            s3Service.deleteImage(url);
+                        }
+                        repository.delete(existingResult); // DB 분석 결과 삭제
+                    } catch (Exception e) {
+                        // S3 또는 DB 삭제 중 오류 발생 시 전체 예외 던짐
+                        throw new RuntimeException("기존 분석 결과 삭제 중 오류 발생가 발생했습니다.", e);
                     }
-                    repository.delete(existingResult); // DB 분석 결과 삭제
                 });
     }
 
@@ -161,7 +157,7 @@ public class SkinAnalysisService {
         HttpHeaders headers = new HttpHeaders(); // 헤더 정보 구성
         headers.setContentType(MediaType.MULTIPART_FORM_DATA); // 보내는 데이터 타입 명시
 
-        // 요청 본문에 들어갈 키-값 쌍을 저장 (정면, 위, 아래 등 key로 지정하고 값은 이미지 파일)
+        // 요청 본문에 들어갈 키-값 쌍을 저장 (정면, 좌측, 우측 key로 지정하고 값은 이미지 파일)
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         for (Map.Entry<String, MultipartFile> entry : imageFileMap.entrySet()) {
             body.add(entry.getKey(), entry.getValue().getResource());
@@ -170,13 +166,21 @@ public class SkinAnalysisService {
         // 본문 + 헤더 합치기
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map<String, Integer>> response = restTemplate.exchange(
-                aiServerUrl,
-                HttpMethod.POST,
-                requestEntity,
-                new ParameterizedTypeReference<>() {}
-        );
-
-        return response.getBody();
+        try {
+            ResponseEntity<Map<String, Integer>> response = restTemplate.exchange(
+                    aiServerUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
+            return response.getBody();
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new RuntimeException("AI 서버에서 오류 응답이 발생했습니다. " + e.getStatusCode(), e);
+        } catch (ResourceAccessException e) {
+            throw new RuntimeException("AI 서버에 연결할 수 없습니다.", e);
+        } catch (RestClientException e) {
+            throw new RuntimeException("AI 서버 호출 중 오류가 발생했습니다.", e);
+        }
     }
 }

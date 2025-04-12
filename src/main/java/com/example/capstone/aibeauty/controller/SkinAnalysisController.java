@@ -27,10 +27,12 @@ public class SkinAnalysisController {
         try {
             String analysisId = skinAnalysisService.analyze(request, authentication);
             return ResponseEntity.ok(Map.of("analysisId", analysisId)); //분석 결과 고유 id 반환
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of("message", "서버 내부 오류 (이미지 업로드 실패)"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(Map.of("message", "요청 처리 중 오류가 발생했습니다.a"));
         }
     }
 }
