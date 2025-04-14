@@ -4,6 +4,7 @@ import com.example.capstone.aibeauty.domain.SkinAnalysisResult;
 import com.example.capstone.aibeauty.dto.SkinAnalysisResponse;
 import com.example.capstone.aibeauty.repository.SkinAnalysisResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,10 +20,14 @@ public class SkinAnalysisResultService {
 
     // 분석 결과 id를 기반으로 DB에서 데이터를 조회하고 이를 응답 DTO로 변환하여 반환
     public SkinAnalysisResponse getAnalysisResult(String analysisId) {
-        SkinAnalysisResult result = repository.findByAnalysisId(analysisId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 id의 분석 결과를 찾을 수 없습니다."));
+        try {
+            SkinAnalysisResult result = repository.findByAnalysisId(analysisId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 분석 결과를 찾을 수 없습니다."));
 
-        return fromEntity(result);
+            return fromEntity(result);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("분석 결과 조회 중 오류가 발생했습니다.", e);
+        }
     }
 
     // 사용자 id를 기반으로 피부 분석 결과의 날짜 목록을 반환

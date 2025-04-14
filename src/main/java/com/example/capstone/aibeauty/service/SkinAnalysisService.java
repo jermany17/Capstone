@@ -7,6 +7,8 @@ import com.example.capstone.auth.domain.User;
 import com.example.capstone.awss3.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -104,7 +106,14 @@ public class SkinAnalysisService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        repository.save(result);
+        try {
+            repository.save(result);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("분석 결과 저장 중 무결성 제약 조건 위반이 발생했습니다.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("분석 결과를 데이터베이스에 저장하는 중 오류가 발생했습니다.", e);
+        }
+
         //분석 결과 고유 id 반환
         return analysisId;
     }

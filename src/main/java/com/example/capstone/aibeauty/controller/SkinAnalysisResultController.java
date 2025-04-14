@@ -28,6 +28,8 @@ public class SkinAnalysisResultController {
         } catch (IllegalArgumentException e) {
             // 고유 id에 해당하는 분석 결과가 없는 경우
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
         }
     }
 }
