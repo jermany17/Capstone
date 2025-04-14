@@ -185,7 +185,7 @@ public class SkinAnalysisService {
             );
             return response.getBody();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            throw new RuntimeException("AI 서버에서 오류 응답이 발생했습니다. " + e.getStatusCode(), e);
+            throw new RuntimeException("AI 서버에서 오류 응답이 발생했습니다. ", e);
         } catch (ResourceAccessException e) {
             throw new RuntimeException("AI 서버에 연결할 수 없습니다.", e);
         } catch (RestClientException e) {
