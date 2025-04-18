@@ -1,13 +1,12 @@
 package com.example.capstone.aidisease.controller;
 
 import com.example.capstone.aidisease.dto.DiagnosisResultResponse;
+import com.example.capstone.aidisease.dto.DiseaseDetailResponse;
+import com.example.capstone.aidisease.service.DiseaseDetailService;
 import com.example.capstone.aidisease.service.DiagnosisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,7 +17,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/skin-diagnosis")
 public class DiagnosisController {
+
     private final DiagnosisService diagnosisService;
+    private final DiseaseDetailService diseaseDetailService;
 
     @PostMapping
     public ResponseEntity<?> diagnose(@RequestParam("image") MultipartFile file) { //"image" 키에 해당하는 값
@@ -53,5 +54,18 @@ public class DiagnosisController {
         //피부질환진단
         DiagnosisResultResponse result = diagnosisService.diagnose(file);
         return ResponseEntity.ok(result);
+    }
+
+    // 피부 질환 추가 정보
+    @GetMapping("/detail")
+    public ResponseEntity<?> getDiseaseDetail(@RequestParam String disease) {
+        try {
+            DiseaseDetailResponse response = diseaseDetailService.getDiseaseDetailByName(disease);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("질환 정보를 불러오는 과정에서 오류가 발생했습니다.");
+        }
     }
 }
