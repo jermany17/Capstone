@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.time.LocalDate;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.UUID.randomUUID;
 
@@ -38,84 +39,91 @@ public class SkinAnalysisService {
 
     private final String aiServerUrl = "https://59ef-223-195-38-166.ngrok-free.app/beauty"; // AI 서버 주소
 
+    private static final Map<String, Object> userLocks = new ConcurrentHashMap<>();
+
     public String analyze(SkinAnalysisRequest request, Authentication authentication) throws IOException {
         User user = (User) authentication.getPrincipal();
         String userId = user.getUserId(); // 현재 로그인 되어 있는 사용자
-        String analysisId = randomUUID().toString(); // 분석 결과 고유 id 생성
 
-        // 이미지 요청 정보를 Map으로 구성 (정면, 좌측, 우측)
-        Map<String, MultipartFile> imageMap = new LinkedHashMap<>();
-        imageMap.put("front", request.getFront());
-        imageMap.put("left", request.getLeft());
-        imageMap.put("right", request.getRight());
+        Object userLock = userLocks.computeIfAbsent(userId, k -> new Object()); // 사용자별 동기화 객체
 
-        // 이미지 없는 경우 검사 = null 체크 (getKey()로 어디 각도 이미지 안 들어왔는지 에러 메시지에 표시)
-        for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
-            if (entry.getValue() == null) {
-                throw new IllegalArgumentException("이미지 데이터 수신 과정에서 오류가 발생했습니다");
-            }
-        }
+        synchronized (userLock) { // 같은 사용자가 동시에 여러 요청을 보내도 하나씩만 처리된다.
+            String analysisId = randomUUID().toString(); // 분석 결과 고유 id 생성
 
-        // 업로드된 이미지의 S3 URL을 담을 Map = (정면, 좌측, 우측)이랑 이미지 URL 을 키-값 쌍으로 저장
-        Map<String, String> imageUrlMap = new LinkedHashMap<>();
+            // 이미지 요청 정보를 Map으로 구성 (정면, 좌측, 우측)
+            Map<String, MultipartFile> imageMap = new LinkedHashMap<>();
+            imageMap.put("front", request.getFront());
+            imageMap.put("left", request.getLeft());
+            imageMap.put("right", request.getRight());
 
-        // 모든 이미지 유효성 검사 먼저 수행
-        for (MultipartFile file : imageMap.values()) {
-            validateImage(file);
-        }
-
-        // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
-        deleteExistingResultIfExists(userId, LocalDate.now());
-
-        try {
-            // 유효성 검사 통과 후 s3 업로드 수행
+            // 이미지 없는 경우 검사 = null 체크 (getKey()로 어디 각도 이미지 안 들어왔는지 에러 메시지에 표시)
             for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
-                String key = entry.getKey();
-                MultipartFile file = entry.getValue();
-                String customPath = String.format("skin-analysis/%s/%s/%s", userId, analysisId, key); // 경로 직접 지정
-                String s3Url = s3Service.uploadImageWithCustomPath(file, customPath);
-                imageUrlMap.put(key, s3Url);
+                if (entry.getValue() == null) {
+                    throw new IllegalArgumentException("이미지 데이터 수신 과정에서 오류가 발생했습니다");
+                }
             }
-        } catch (IOException | RuntimeException e) { // s3Service에서 발생할 수 있는 오류
-            throw new RuntimeException("S3 이미지 업로드 중 오류가 발생했습니다.");
+
+            // 업로드된 이미지의 S3 URL을 담을 Map = (정면, 좌측, 우측)이랑 이미지 URL 을 키-값 쌍으로 저장
+            Map<String, String> imageUrlMap = new LinkedHashMap<>();
+
+            // 모든 이미지 유효성 검사 먼저 수행
+            for (MultipartFile file : imageMap.values()) {
+                validateImage(file);
+            }
+
+            // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
+            deleteExistingResultIfExists(userId, LocalDate.now());
+
+            try {
+                // 유효성 검사 통과 후 s3 업로드 수행
+                for (Map.Entry<String, MultipartFile> entry : imageMap.entrySet()) {
+                    String key = entry.getKey();
+                    MultipartFile file = entry.getValue();
+                    String customPath = String.format("skin-analysis/%s/%s/%s", userId, analysisId, key); // 경로 직접 지정
+                    String s3Url = s3Service.uploadImageWithCustomPath(file, customPath);
+                    imageUrlMap.put(key, s3Url);
+                }
+            } catch (IOException | RuntimeException e) { // s3Service에서 발생할 수 있는 오류
+                throw new RuntimeException("S3 이미지 업로드 중 오류가 발생했습니다.");
+            }
+
+            // AI 서버에 이미지 분석 요청
+            Map<String, Integer> aiResult = callAiServer(imageMap);
+
+            // 분석 결과를 DB에 저장
+            SkinAnalysisResult result = SkinAnalysisResult.builder()
+                    .analysisId(analysisId)
+                    .userId(userId)
+                    .imageUrls(new ArrayList<>(imageUrlMap.values()))
+                    .totalWrinkle(aiResult.get("totalWrinkle"))
+                    .totalPigmentation(aiResult.get("totalPigmentation"))
+                    .totalPore(aiResult.get("totalPore"))
+                    .skinAge(aiResult.get("skinAge"))
+                    .foreheadWrinkle(aiResult.get("foreheadWrinkle"))
+                    .foreheadPigmentation(aiResult.get("foreheadPigmentation"))
+                    .glabellaWrinkle(aiResult.get("glabellaWrinkle"))
+                    .lefteyeWrinkle(aiResult.get("lefteyeWrinkle"))
+                    .righteyeWrinkle(aiResult.get("righteyeWrinkle"))
+                    .leftcheekPigmentation(aiResult.get("leftcheekPigmentation"))
+                    .leftcheekPore(aiResult.get("leftcheekPore"))
+                    .rightcheekPigmentation(aiResult.get("rightcheekPigmentation"))
+                    .rightcheekPore(aiResult.get("rightcheekPore"))
+                    .lipDryness(aiResult.get("lipDryness"))
+                    .jawlineSagging(aiResult.get("jawlineSagging"))
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            try {
+                repository.save(result);
+            } catch (DataIntegrityViolationException e) {
+                throw new RuntimeException("분석 결과 저장 중 무결성 제약 조건 위반이 발생했습니다.", e);
+            } catch (DataAccessException e) {
+                throw new RuntimeException("분석 결과를 데이터베이스에 저장하는 중 오류가 발생했습니다.", e);
+            }
+
+            //분석 결과 고유 id 반환
+            return analysisId;
         }
-
-        // AI 서버에 이미지 분석 요청
-        Map<String, Integer> aiResult = callAiServer(imageMap);
-
-        // 분석 결과를 DB에 저장
-        SkinAnalysisResult result = SkinAnalysisResult.builder()
-                .analysisId(analysisId)
-                .userId(userId)
-                .imageUrls(new ArrayList<>(imageUrlMap.values()))
-                .totalWrinkle(aiResult.get("totalWrinkle"))
-                .totalPigmentation(aiResult.get("totalPigmentation"))
-                .totalPore(aiResult.get("totalPore"))
-                .skinAge(aiResult.get("skinAge"))
-                .foreheadWrinkle(aiResult.get("foreheadWrinkle"))
-                .foreheadPigmentation(aiResult.get("foreheadPigmentation"))
-                .glabellaWrinkle(aiResult.get("glabellaWrinkle"))
-                .lefteyeWrinkle(aiResult.get("lefteyeWrinkle"))
-                .righteyeWrinkle(aiResult.get("righteyeWrinkle"))
-                .leftcheekPigmentation(aiResult.get("leftcheekPigmentation"))
-                .leftcheekPore(aiResult.get("leftcheekPore"))
-                .rightcheekPigmentation(aiResult.get("rightcheekPigmentation"))
-                .rightcheekPore(aiResult.get("rightcheekPore"))
-                .lipDryness(aiResult.get("lipDryness"))
-                .jawlineSagging(aiResult.get("jawlineSagging"))
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        try {
-            repository.save(result);
-        } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("분석 결과 저장 중 무결성 제약 조건 위반이 발생했습니다.", e);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("분석 결과를 데이터베이스에 저장하는 중 오류가 발생했습니다.", e);
-        }
-
-        //분석 결과 고유 id 반환
-        return analysisId;
     }
 
     // 이미지 유효성 검사 메서드
