@@ -41,7 +41,18 @@ public class DiagnosisService {
 
         //AI 분석 결과 파싱
         String disease = (String) aiResponse.getBody().get("Disease");
-        float probability = Float.parseFloat(aiResponse.getBody().get("Probability").toString());
+        double probability = Double.parseDouble(aiResponse.getBody().get("Probability").toString());
+
+        // 피부 질환이 아닌 경우 응답 빌드
+        if ("피부질환없음".equals(disease)) {
+            return DiagnosisResultResponse.builder()
+                    .disease(disease)
+                    .probability(probability)
+                    .treatment("없음")
+                    .source("없음")
+                    .imageUrl("없음")
+                    .build();
+        }
 
         //DB에서 질환 정보 조회
         DiseaseTreatment treatmentInfo = treatmentRepository.findByDisease(disease)

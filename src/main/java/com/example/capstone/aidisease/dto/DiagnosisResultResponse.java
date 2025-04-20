@@ -9,7 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DiagnosisResultResponse {
     private String disease;
-    private float probability;
+    private double probability;
     private String treatment;
     private String source;
     private String imageUrl;
