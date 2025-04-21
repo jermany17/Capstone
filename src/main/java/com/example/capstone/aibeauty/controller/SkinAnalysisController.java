@@ -32,7 +32,7 @@ public class SkinAnalysisController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of("message", "요청 처리 중 오류가 발생했습니다.a"));
+            return ResponseEntity.status(500).body(Map.of("message", "요청 처리 중 오류가 발생했습니다."));
         }
     }
 }
