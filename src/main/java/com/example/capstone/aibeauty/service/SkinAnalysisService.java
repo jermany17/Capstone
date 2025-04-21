@@ -63,16 +63,16 @@ public class SkinAnalysisService {
                 }
             }
 
-            // 업로드된 이미지의 S3 URL을 담을 Map = (정면, 좌측, 우측)이랑 이미지 URL 을 키-값 쌍으로 저장
-            Map<String, String> imageUrlMap = new LinkedHashMap<>();
-
             // 모든 이미지 유효성 검사 먼저 수행
             for (MultipartFile file : imageMap.values()) {
                 validateImage(file);
             }
 
-            // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
-            deleteExistingResultIfExists(userId, LocalDate.now());
+            // AI 서버에 이미지 분석 요청
+            Map<String, Integer> aiResult = callAiServer(imageMap);
+
+            // 업로드된 이미지의 S3 URL을 담을 Map = (정면, 좌측, 우측)이랑 이미지 URL 을 키-값 쌍으로 저장
+            Map<String, String> imageUrlMap = new LinkedHashMap<>();
 
             try {
                 // 유효성 검사 통과 후 s3 업로드 수행
@@ -87,8 +87,8 @@ public class SkinAnalysisService {
                 throw new RuntimeException("S3 이미지 업로드 중 오류가 발생했습니다.");
             }
 
-            // AI 서버에 이미지 분석 요청
-            Map<String, Integer> aiResult = callAiServer(imageMap);
+            // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
+            deleteExistingResultIfExists(userId, LocalDate.now());
 
             // 분석 결과를 DB에 저장
             SkinAnalysisResult result = SkinAnalysisResult.builder()
@@ -191,7 +191,16 @@ public class SkinAnalysisService {
                     new ParameterizedTypeReference<>() {
                     }
             );
-            return response.getBody();
+
+            Map<String, Integer> aiResult = response.getBody();
+
+            // 얼굴 사진이 아닌 경우, 얼굴 사진을 제대로 인식하지 못한 경우 (AI서버에서 skinAge를 -1 값으로 응답 보내줌)
+            if (aiResult.getOrDefault("skinAge", -1) == -1) {
+                throw new IllegalArgumentException("피부 이미지가 아닙니다. 얼굴이 명확하게 보이도록 다시 촬영한 이미지를 업로드해주세요.");
+            }
+
+            return aiResult;
+
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new RuntimeException("AI 서버에서 오류 응답이 발생했습니다. ", e);
         } catch (ResourceAccessException e) {
