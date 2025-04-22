@@ -40,6 +40,7 @@ public class WebSecurityConfig {
                                 "/s3/upload", "/s3/delete",
                                 "/hospital/**", "/skin-diagnosis/**",
                                 "/skin-analysis/**", "/cosmetic-recommend",
+                                "/care-mission/**",
                                 "/posts/create", "/posts/delete/**", "/posts/like/**" ).authenticated()
                         .anyRequest().denyAll()
                 )
