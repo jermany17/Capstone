@@ -17,4 +17,7 @@ public interface SkinAnalysisResultRepository extends JpaRepository<SkinAnalysis
 
     // 지정한 사용자 id와 지정한 날짜에 해당하는 피부 분석 결과 조회
     Optional<SkinAnalysisResult> findByUserIdAndCreatedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
+
+    // 최신 분석 결과 조회 (스킨케어 미션 생성용)
+    Optional<SkinAnalysisResult> findTopByUserIdOrderByCreatedAtDesc(String userId);
 }
