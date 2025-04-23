@@ -53,13 +53,34 @@ public class PostService {
 
     @Transactional
     public List<PostInfo> getLatestPostsPaged(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createAt"));
+        Pageable pageable = PageRequest.of(page - 1, size);
         Page<Post> postPage = postRepository.findAllByOrderByCreateAtDesc(pageable);
 
         return postPage.getContent().stream()
                 .map(PostInfo::new)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public List<PostInfo> getPostsSortedByLikes(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Post> postPage = postRepository.findAllOrderByLikesCountDesc(pageable);
+
+        return postPage.getContent().stream()
+                .map(PostInfo::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<PostInfo> getPostsSortedByComments(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Post> postPage = postRepository.findAllOrderByCommentsCountDesc(pageable);
+
+        return postPage.getContent().stream()
+                .map(PostInfo::new)
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public PostInfo getPostById(Long id) {

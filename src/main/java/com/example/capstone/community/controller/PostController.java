@@ -53,13 +53,31 @@ public class PostController {
         }
     }
 
-    // 게시물 조회(size, page)
+    // 게시물 전체 조회 (최신순)
     @GetMapping("/read-latest")
     public ResponseEntity<List<PostInfo>> getAllPostsPaged(
             @RequestParam("size") int size,
             @RequestParam("page") int page
     ) {
         return ResponseEntity.ok(postService.getLatestPostsPaged(page, size));
+    }
+
+    // 게시물 전체 조회 (좋아요 순)
+    @GetMapping("/read-most-liked")
+    public ResponseEntity<List<PostInfo>> getPostsByLikes(
+            @RequestParam("size") int size,
+            @RequestParam("page") int page
+    ) {
+        return ResponseEntity.ok(postService.getPostsSortedByLikes(page, size));
+    }
+
+    // 게시물 전체 조회 (댓글 수 순)
+    @GetMapping("/read-most-commented")
+    public ResponseEntity<List<PostInfo>> getPostsByComments(
+            @RequestParam("size") int size,
+            @RequestParam("page") int page
+    ) {
+        return ResponseEntity.ok(postService.getPostsSortedByComments(page, size));
     }
 
     // 게시물 단일 조회
@@ -72,6 +90,7 @@ public class PostController {
             return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
         }
     }
+
 
     // 게시물 삭제
     @DeleteMapping("/delete/{postId}")
