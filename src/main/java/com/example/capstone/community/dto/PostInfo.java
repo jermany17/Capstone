@@ -38,11 +38,13 @@ public class PostInfo {
 
     @Getter
     public static class CommentDto {
+        private final Long id;
         private final String userName;
         private final String content;
         private final LocalDateTime createAt;
 
         public CommentDto(Comment comment) {
+            this.id = comment.getId();
             this.userName = comment.getUserName();
             this.content = comment.getContent();
             this.createAt = comment.getCreateAt();

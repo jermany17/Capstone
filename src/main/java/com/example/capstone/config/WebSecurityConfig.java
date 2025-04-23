@@ -41,7 +41,7 @@ public class WebSecurityConfig {
                                 "/hospital/**", "/skin-diagnosis/**",
                                 "/skin-analysis/**", "/cosmetic-recommend",
                                 "/care-mission/**",
-                                "/posts/create", "/posts/delete/**", "/posts/like/**" ).authenticated()
+                                "/posts/**", "/comments/**" ).authenticated()
                         .anyRequest().denyAll()
                 )
                 .exceptionHandling(exception -> exception

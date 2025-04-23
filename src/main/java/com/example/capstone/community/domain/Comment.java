@@ -48,4 +48,8 @@ public class Comment {
         this.content = content;
         this.post = post;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

@@ -22,8 +22,8 @@ public class PostController {
     // 게시물 생성
     @PostMapping("/create")
     public ResponseEntity<Map<String, ?>> createPost(
-            @RequestPart("title") String title,
-            @RequestPart("content") String content,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             Authentication authentication
     ) {
@@ -63,10 +63,10 @@ public class PostController {
     }
 
     // 게시물 단일 조회
-    @GetMapping("/read-one/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+    @GetMapping("/read-one/{postId}")
+    public ResponseEntity<?> getPostById(@PathVariable Long postId) {
         try {
-            PostInfo postInfo = postService.getPostById(id);
+            PostInfo postInfo = postService.getPostById(postId);
             return ResponseEntity.ok(postInfo);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
@@ -74,10 +74,10 @@ public class PostController {
     }
 
     // 게시물 삭제
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
+    @DeleteMapping("/delete/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId, Authentication authentication) {
         try {
-            postService.deletePost(id, authentication);
+            postService.deletePost(postId, authentication);
             return ResponseEntity.ok(Map.of("message", "게시물이 성공적으로 삭제되었습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
@@ -87,13 +87,13 @@ public class PostController {
     }
 
     // 좋아요 등록 & 취소
-    @PostMapping("/like/{id}")
+    @PostMapping("/like/{postId}")
     public ResponseEntity<?> toggleLike(
-            @PathVariable Long id,
+            @PathVariable Long postId,
             Authentication authentication
     ) {
         try {
-            boolean liked = postService.toggleLike(id, authentication);
+            boolean liked = postService.toggleLike(postId, authentication);
             return ResponseEntity.ok(Map.of("message", liked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
@@ -101,10 +101,10 @@ public class PostController {
     }
 
     // 좋아요 개수
-    @GetMapping("/like-count/{id}")
-    public ResponseEntity<?> getLikeCount(@PathVariable Long id) {
+    @GetMapping("/like-count/{postId}")
+    public ResponseEntity<?> getLikeCount(@PathVariable Long postId) {
         try {
-            int count = postService.getLikeCount(id);
+            int count = postService.getLikeCount(postId);
             return ResponseEntity.ok(Map.of("likeCount", count));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
