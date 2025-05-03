@@ -45,7 +45,7 @@ public class DiagnosisService {
 
         // 피부 질환이 아닌 경우 예외 처리
         if ("피부질환없음".equals(disease)) {
-            throw new IllegalArgumentException("피부 질환이 감지되지 않았습니다. 피부가 촬영된 이미지인지 확인 후 다시 업로드해주세요.");
+            throw new IllegalArgumentException("피부 질환이 검출되지 않았습니다. 피부가 촬영된 이미지인지 확인 후 다시 업로드해주세요.");
         }
 
         // DB에서 질환 정보 조회

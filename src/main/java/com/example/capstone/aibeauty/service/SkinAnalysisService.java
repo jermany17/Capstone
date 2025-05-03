@@ -202,7 +202,7 @@ public class SkinAnalysisService {
 
             // 얼굴 사진이 아닌 경우, 얼굴 사진을 제대로 인식하지 못한 경우 (AI서버에서 skinAge를 -1 값으로 응답 보내줌)
             if (aiResult.getOrDefault("skinAge", -1) == -1) {
-                throw new IllegalArgumentException("피부 이미지가 아닙니다. 얼굴이 명확하게 보이도록 다시 촬영한 이미지를 업로드해주세요.");
+                throw new IllegalArgumentException("얼굴 이미지가 아닙니다. 얼굴이 명확하게 보이도록 다시 촬영한 이미지를 업로드해주세요.");
             }
 
             return aiResult;
