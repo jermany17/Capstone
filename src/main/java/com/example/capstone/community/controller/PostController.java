@@ -31,6 +31,10 @@ public class PostController {
             return ResponseEntity.badRequest().body(Map.of("message", "제목은 1자 이상 20자 이하여야 합니다."));
         }
 
+        if (content == null || content.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "내용은 비워둘 수 없습니다."));
+        }
+        
         if (files != null) {
             for (MultipartFile file : files) {
                 if (file.isEmpty()) {
