@@ -91,6 +91,33 @@ public class PostController {
         }
     }
 
+    // 게시물 수정
+    @PutMapping("/update/{postId}")
+    public ResponseEntity<?> updatePost(
+            @PathVariable Long postId,
+            @RequestBody Map<String, String> request,
+            Authentication authentication
+    ) {
+        String title = request.get("title");
+        String content = request.get("content");
+
+        if (title == null || title.trim().isEmpty() || title.length() > 20) {
+            return ResponseEntity.badRequest().body(Map.of("message", "제목은 1자 이상 20자 이하여야 합니다."));
+        }
+
+        if (content == null || content.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "내용은 비워둘 수 없습니다."));
+        }
+
+        try {
+            postService.updatePost(postId, title, content, authentication);
+            return ResponseEntity.ok(Map.of("message", "게시물이 수정되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("message", e.getMessage()));
+        }
+    }
 
     // 게시물 삭제
     @DeleteMapping("/delete/{postId}")

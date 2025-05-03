@@ -90,6 +90,20 @@ public class PostService {
     }
 
     @Transactional
+    public void updatePost(Long postId, String title, String content, Authentication authentication) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+
+        User user = (User) authentication.getPrincipal();
+        if (!post.getUserId().equals(user.getUserId())) {
+            throw new SecurityException("게시물 수정 권한이 없습니다.");
+        }
+
+        // 이미지 수정은 제외하고 제목/내용만 수정
+        post.update(title, content);
+    }
+
+    @Transactional
     public void deletePost(Long id, Authentication authentication) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
