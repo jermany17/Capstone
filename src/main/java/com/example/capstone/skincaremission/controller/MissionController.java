@@ -3,6 +3,7 @@ package com.example.capstone.skincaremission.controller;
 import com.example.capstone.skincaremission.dto.DailyMissionResponse;
 import com.example.capstone.skincaremission.dto.MissionCheckRequest;
 import com.example.capstone.skincaremission.dto.MissionScoreResponse;
+import com.example.capstone.skincaremission.dto.TopMissionScoresResponse;
 import com.example.capstone.skincaremission.service.MissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +61,15 @@ public class MissionController {
     public ResponseEntity<?> getAverageScore(Authentication authentication) {
         MissionScoreResponse response = missionService.calculateAverageScore(authentication);
         return ResponseEntity.ok(response);
+    }
+
+    // 미션 점수 상위 3명
+    @GetMapping("/top3")
+    public ResponseEntity<?> getTopMissionScorers() {
+        try {
+            return ResponseEntity.ok(missionService.getTopMissionScores());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
     }
 }

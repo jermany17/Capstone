@@ -6,9 +6,7 @@ import com.example.capstone.auth.domain.User;
 import com.example.capstone.skincaremission.domain.MissionTemplate;
 import com.example.capstone.skincaremission.domain.UserMissionCheck;
 import com.example.capstone.skincaremission.domain.UserMissionSet;
-import com.example.capstone.skincaremission.dto.DailyMissionResponse;
-import com.example.capstone.skincaremission.dto.MissionCheckRequest;
-import com.example.capstone.skincaremission.dto.MissionScoreResponse;
+import com.example.capstone.skincaremission.dto.*;
 import com.example.capstone.skincaremission.repository.MissionCheckRepository;
 import com.example.capstone.skincaremission.repository.MissionSetRepository;
 import com.example.capstone.skincaremission.repository.MissionTemplateRepository;
@@ -16,12 +14,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -184,7 +185,7 @@ public class MissionService {
         // 기록이 없는 상태에서 조회 -> 오늘 날짜 기준 0점 반환 (프론트에서 적절한 메시지 출력 예: 아직 미션 시작 안 했습니다.)
         if (firstCheck.isEmpty()) {
             LocalDate today = LocalDate.now();
-            return new MissionScoreResponse(today, today, 0);
+            return new MissionScoreResponse(today, today, 0, 0);
         }
 
         // 시작 날짜 ~ 오늘까지 날짜 구간 생성
@@ -204,8 +205,23 @@ public class MissionService {
         }
 
         // 미션 점수 계산 (100점 만점, 반올림)
-        int average = (int) Math.round((totalScore / (double) (dates.size() * 5)) * 100);
+        int averageScore = (int) Math.round((totalScore / (double) (dates.size() * 5)) * 100);
 
-        return new MissionScoreResponse(start, end, average);
+        return new MissionScoreResponse(start, end, averageScore, totalScore);
+    }
+
+    // 미션 총합 점수 상위 3명
+    public TopMissionScoresResponse getTopMissionScores() {
+        Pageable top3 = PageRequest.of(0, 3); // 상위 3명
+        List<Object[]> result = missionCheckRepository.findTopMissionScorers(top3);
+
+        List<TopUserScoreDto> topUsers = result.stream()
+                .map(row -> new TopUserScoreDto( // TopUserScoreDto 객체로 바꿈
+                        (String) row[0],              // userId
+                        ((Number) row[1]).intValue()  // doneCount 합
+                ))
+                .collect(Collectors.toList()); // List로 모음
+
+        return new TopMissionScoresResponse(topUsers); // DTO 리스트 담은 객체로 생성해서 반환
     }
 }
