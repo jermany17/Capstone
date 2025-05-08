@@ -32,7 +32,7 @@ public class WebSecurityConfig {
 
                         // 로그인 없이 접근 가능
                         .requestMatchers("/check-login", "/check-userid", "/signup", "/login", "/logout",
-                                "posts/read-latest/**", "posts/read-most-liked/**", "posts/read-most-commented/**",
+                                "/posts/read-latest/**", "/posts/read-most-liked/**", "/posts/read-most-commented/**",
                                 "/posts/read-one/**", "/posts/like-count/**" ).permitAll()
 
                         // 로그인된 사용자만 접근 가능
