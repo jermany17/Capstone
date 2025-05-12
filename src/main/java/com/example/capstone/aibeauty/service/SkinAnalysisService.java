@@ -90,11 +90,12 @@ public class SkinAnalysisService {
             // 같은 날 기존 분석 결과가 있으면 삭제 (최신 분석 결과만 유지하기 위함)
             deleteExistingResultIfExists(userId, LocalDate.now());
 
-            // 나이 평균 내서 저장하기
-            int realAge = LocalDate.now().getYear() - user.getUserBirthday().getYear(); // 나이 계산
-            realAge = (realAge / 10) * 10; // 예시: 27세이면 → 20대로
-            int aiAge = aiResult.get("skinAge"); // 예시: 30대로 나오면
-            int averageAge = ((realAge + aiAge) / 2 / 10) * 10; // 25세이면 → 20대로
+
+//            // 나이 평균 내서 저장하기
+//            int realAge = LocalDate.now().getYear() - user.getUserBirthday().getYear(); // 나이 계산
+//            realAge = (realAge / 10) * 10; // 예시: 27세이면 → 20대로
+//            int aiAge = aiResult.get("skinAge"); // 예시: 30대로 나오면
+//            int averageAge = ((realAge + aiAge) / 2 / 10) * 10; // 25세이면 → 20대로
 
             // 분석 결과를 DB에 저장
             SkinAnalysisResult result = SkinAnalysisResult.builder()
@@ -104,7 +105,8 @@ public class SkinAnalysisService {
                     .totalWrinkle(aiResult.get("totalWrinkle"))
                     .totalPigmentation(aiResult.get("totalPigmentation"))
                     .totalPore(aiResult.get("totalPore"))
-                    .skinAge(averageAge)
+                    //.skinAge(averageAge)
+                    .skinAge(aiResult.get("skinAge"))
                     .foreheadWrinkle(aiResult.get("foreheadWrinkle"))
                     .foreheadPigmentation(aiResult.get("foreheadPigmentation"))
                     .glabellaWrinkle(aiResult.get("glabellaWrinkle"))
