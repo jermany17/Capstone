@@ -148,4 +148,13 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
         return post.getLikes().size();
     }
+
+    @Transactional
+    public boolean checkIfUserLikedPost(Long postId, Authentication authentication) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+
+        User user = (User) authentication.getPrincipal();
+        return post.getLikes().contains(user.getUserId());
+    }
 }

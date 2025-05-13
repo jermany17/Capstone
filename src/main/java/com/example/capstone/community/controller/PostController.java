@@ -160,4 +160,18 @@ public class PostController {
             return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
         }
     }
+
+    // 좋아요 여부 확인
+    @GetMapping("/like-check/{postId}")
+    public ResponseEntity<?> checkIfLiked(
+            @PathVariable Long postId,
+            Authentication authentication
+    ) {
+        try {
+            boolean isLiked = postService.checkIfUserLikedPost(postId, authentication);
+            return ResponseEntity.ok(Map.of("check", isLiked));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        }
+    }
 }
