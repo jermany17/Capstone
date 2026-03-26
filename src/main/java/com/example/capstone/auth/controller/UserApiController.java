@@ -151,7 +151,7 @@ public class UserApiController {
         return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
 
-    // 회원 삭제 API
+    // 회원 삭제 API //
     @DeleteMapping("/delete-account")
     public ResponseEntity<Map<String, String>> deleteUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
